@@ -17,7 +17,7 @@ import com.alibaba.fastjson.JSON;
 public class RowMapper extends Mapper<LongWritable, Text, Text, Text> {
 	
 	private final Pattern titlePattern = Pattern.compile("<title>.+</title>");
-	private final Pattern textPattern = Pattern.compile("<text>.+</text>");
+	private final Pattern textPattern = Pattern.compile("<text.*?>.+</text>");
 	private final Pattern linkPattern = Pattern.compile("\\[\\[.+\\]\\]");
 	
 	public void map(LongWritable key, Text value, Context context)
@@ -43,12 +43,14 @@ public class RowMapper extends Mapper<LongWritable, Text, Text, Text> {
 					text = text.substring(7, text.length() - 7);
 				}
 				
-				if (title == null || text == null) {
-					System.out.println("null title");
+				if (title == null) {
 					continue;
 				}
 				
-				List<String> links = parseLinks(text);
+				List<String> links = new ArrayList<>();
+				if (text != null) {
+					links = parseLinks(text);
+				}
 				context.write(new Text(title), new Text(JSON.toJSONString(links)));
 			}
 		}
