@@ -26,6 +26,8 @@ public class App {
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
 
+		job.setNumReduceTasks(0);
+		
 		MultipleInputs.addInputPath(job, new Path(args[0]), TextInputFormat.class);
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
