@@ -18,7 +18,7 @@ public class RowMapper extends Mapper<LongWritable, Text, Text, Text> {
 	
 	private final Pattern titlePattern = Pattern.compile("<title>.+</title>");
 	private final Pattern textPattern = Pattern.compile("<text.*?>.+</text>");
-	private final Pattern linkPattern = Pattern.compile("\\[\\[.+\\]\\]");
+	private final Pattern linkPattern = Pattern.compile("\\[\\[.+?\\]\\]");
 	
 	public void map(LongWritable key, Text value, Context context)
 			throws IOException, InterruptedException {
