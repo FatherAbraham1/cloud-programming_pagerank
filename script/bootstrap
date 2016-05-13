@@ -1,0 +1,12 @@
+#!/bin/sh
+
+BASEDIR=$(dirname "$0")
+
+echo 'Installing Apache Maven...'
+(
+  cd $BASEDIR/../tool
+  rm -rf apache-maven
+  curl -s http://apache.stu.edu.tw/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz | tar xz
+  mv apache-maven-3.3.9 apache-maven
+)
+echo 'Apache Maven installed in tool/apache-maven'
