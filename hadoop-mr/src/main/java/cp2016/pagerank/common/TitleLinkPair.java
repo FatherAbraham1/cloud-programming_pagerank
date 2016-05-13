@@ -1,16 +1,20 @@
-package cp2016.pagerank.parse;
+package cp2016.pagerank.common;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
+
+import com.alibaba.fastjson.JSON;
 
 public class TitleLinkPair implements Writable {
 
 	private Text title;
 	private Text linksJSON;
+	private List<String> links = null;
 	
 	public TitleLinkPair() {
 		title = new Text();
@@ -28,6 +32,13 @@ public class TitleLinkPair implements Writable {
 	
 	public String getLinksJSON() {
 		return this.linksJSON.toString();
+	}
+	
+	public List<String> getLinks() {
+		if (links == null) {
+			links = JSON.parseArray(this.linksJSON.toString(), String.class);
+		}
+		return links;
 	}
 	
 	@Override

@@ -7,5 +7,7 @@ hdfs dfs -rm -f -r $2
 
 hdfs dfs -mkdir -p tmp
 
-hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.parse.App $1 $2
-hdfs dfs -cat $2/part-*
+hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.parse.App $1 tmp/init
+hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.filter.App $1 tmp/previous
+
+hdfs dfs -cat tmp/previous/part-*

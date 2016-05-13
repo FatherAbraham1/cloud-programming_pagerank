@@ -10,6 +10,8 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
+import cp2016.pagerank.common.TitleLinkPair;
+
 public class RowReducer extends Reducer<IntWritable, TitleLinkPair, Text, Text> {
 	
 	@Override
@@ -17,7 +19,7 @@ public class RowReducer extends Reducer<IntWritable, TitleLinkPair, Text, Text> 
 			Iterable<TitleLinkPair> values, Context context)
 			throws IOException, InterruptedException {
 		
-		Path path = new Path("tmp/keys");
+		Path path = new Path("tmp/titles");
 		FileSystem fs = FileSystem.get(context.getConfiguration());
 		OutputStreamWriter outStream = new OutputStreamWriter(fs.create(path, true));
 		BufferedWriter br = new BufferedWriter(outStream);

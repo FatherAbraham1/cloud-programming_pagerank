@@ -15,12 +15,15 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 import com.alibaba.fastjson.JSON;
 
+import cp2016.pagerank.common.TitleLinkPair;
+
 public class RowMapper extends Mapper<LongWritable, Text, IntWritable, TitleLinkPair> {
 	
 	private final Pattern titlePattern = Pattern.compile("<title>.+</title>");
 	private final Pattern textPattern = Pattern.compile("<text.*?>.+</text>");
 	private final Pattern linkPattern = Pattern.compile("\\[\\[[^\\]]+\\]\\]");
 	
+	@Override
 	public void map(LongWritable key, Text value, Context context)
 			throws IOException, InterruptedException {
 		String[] vals = value.toString().split("\n");
