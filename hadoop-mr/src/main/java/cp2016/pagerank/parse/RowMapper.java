@@ -22,7 +22,6 @@ public class RowMapper extends Mapper<LongWritable, Text, Text, Text> {
 	
 	public void map(LongWritable key, Text value, Context context)
 			throws IOException, InterruptedException {
-		System.out.println(value.toString().split("\n").length);
 		String[] vals = value.toString().split("\n");
 		for (String val : vals) {
 			if (val == null || val.isEmpty()) {
@@ -45,6 +44,7 @@ public class RowMapper extends Mapper<LongWritable, Text, Text, Text> {
 				}
 				
 				if (title == null || text == null) {
+					System.out.println("null title");
 					continue;
 				}
 				
