@@ -1,6 +1,8 @@
 package cp2016.pagerank.parse;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -8,6 +10,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.text.WordUtils;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -51,6 +55,15 @@ public class RowMapper extends Mapper<LongWritable, Text, Text, Text> {
 				if (text != null) {
 					links = parseLinks(text);
 				}
+				
+				Path path = new Path("tmp/keys");
+                FileSystem fs = FileSystem.get(context.getConfiguration());
+                OutputStreamWriter outStream = new OutputStreamWriter(fs.append(path));
+                BufferedWriter br = new BufferedWriter(outStream);
+                br.write(title + "\n");
+                br.close();
+				outStream.close();
+                
 				context.write(new Text(title), new Text(JSON.toJSONString(links)));
 			}
 		}
