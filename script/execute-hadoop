@@ -2,7 +2,10 @@
 
 BASEDIR=$(dirname "$0")
 
+hdfs dfs -rm -f -r tmp
 hdfs dfs -rm -f -r $2
+
+hdfs dfs -mkdir -p tmp
 
 hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.parse.App $1 $2
 hdfs dfs -cat $2/part-*
