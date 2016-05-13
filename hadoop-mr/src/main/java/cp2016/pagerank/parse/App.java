@@ -3,10 +3,11 @@ package cp2016.pagerank.parse;
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
@@ -14,6 +15,12 @@ public class App {
     public static void main( String[] args ) throws IllegalArgumentException, IOException, ClassNotFoundException, InterruptedException {
     	Configuration config = new Configuration();
     	config.set("mapreduce.output.textoutputformat.separator", "\t");
+    	
+    	
+    	Path path = new Path("tmp/keys");
+        FileSystem fs = FileSystem.get(config);
+        FSDataOutputStream stream = fs.create(path, true);
+        stream.close();
     	
 		Job job = Job.getInstance(config, "PageLinkBuilder");
 		job.setJarByClass(App.class);
