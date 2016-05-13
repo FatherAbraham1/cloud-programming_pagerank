@@ -61,6 +61,7 @@ public class RowMapper extends Mapper<LongWritable, Text, Text, Text> {
 		Matcher linkMatcher = linkPattern.matcher(content);
 		while (linkMatcher.find()) {
 			String linkContent = linkMatcher.group();
+			System.out.println(linkContent);
 			linkContent = linkContent.substring(2, linkContent.length() - 2);
 			{
 				String[] tmp = linkContent.split("\\|");
