@@ -17,12 +17,6 @@ public class App {
     	Configuration config = new Configuration();
     	config.set("mapreduce.output.textoutputformat.separator", "\t");
     	
-    	
-    	Path path = new Path("tmp/keys");
-        FileSystem fs = FileSystem.get(config);
-        FSDataOutputStream stream = fs.create(path, true);
-        stream.close();
-    	
 		Job job = Job.getInstance(config, "PageLinkBuilder");
 		job.setJarByClass(App.class);
 
@@ -35,7 +29,7 @@ public class App {
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
 
-		job.setNumReduceTasks(30);
+		job.setNumReduceTasks(1);
 		
 		TextInputFormat.addInputPath(job, new Path(args[0]));
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
