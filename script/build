@@ -15,3 +15,8 @@ echo 'Building Hadoop MapReduce version...'
 )
 
 echo 'Building Apache Spark version...'
+(
+  cd $BASEDIR/../spark
+  sbt package
+  cp target/scala-2.10/pagerank_2.10-1.0.jar ../target/spark.jar
+)
