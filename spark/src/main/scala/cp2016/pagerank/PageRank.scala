@@ -37,7 +37,8 @@ object PageRank {
       ((xml \ "title").text, links)
     }
     
-    adjMatrix.saveAsTextFile(outputDir)
+    adjMatrix.map { a => (a._1, a._2.toString()) }.saveAsTextFile(outputDir)
+    
     ctx.stop
   }
 }
