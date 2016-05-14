@@ -10,5 +10,6 @@ hdfs dfs -mkdir -p tmp/titles
 
 hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.parse.App $1 tmp/init
 hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.filter.App tmp/init tmp/previous
+hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.sink.App tmp/previous tmp/dummy
 
-hdfs dfs -cat tmp/previous/part-*
+hdfs dfs -cat tmp/sinkNodeScore
