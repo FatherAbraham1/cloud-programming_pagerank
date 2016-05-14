@@ -49,8 +49,8 @@ public class RowMapper extends Mapper<LongWritable, Text, IntWritable, TitleLink
 					text = StringEscapeUtils.unescapeXml(text);
 				}
 
+        System.out.println(title);
 				if (title == null) {
-          System.out.println(val);
 					continue;
 				}
 
