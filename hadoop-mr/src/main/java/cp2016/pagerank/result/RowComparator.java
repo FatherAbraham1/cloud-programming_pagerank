@@ -8,7 +8,7 @@ import cp2016.pagerank.common.TitleRankPair;
 public class RowComparator extends WritableComparator {
 
 	public RowComparator() {
-		super(TitleRankPair.class);
+		super(TitleRankPair.class, true);
 	}
 
   @Override
