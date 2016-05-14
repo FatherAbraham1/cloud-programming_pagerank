@@ -28,7 +28,8 @@ public class RowReducer extends Reducer<Text, ScoreLinkPair, Text, Text> {
 				}
 			}
 		}
-		
+		double stickness = context.getConfiguration().getDouble("stickness", 0.0);
+		score *= stickness;
 		score += constantFactor;
 		
 		context.write(key, new Text(Double.toString(score) + "\t" + link));

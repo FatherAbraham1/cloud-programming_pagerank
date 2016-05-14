@@ -14,3 +14,5 @@ hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.filter.App tmp/init tmp
 $BASEDIR/hadoop-sink-score one
 
 python $BASEDIR/hadoop-py
+
+hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.result.App tmp/stable $2

@@ -1,14 +1,14 @@
-package cp2016.pagerank.filter;
+package cp2016.pagerank.result;
 
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import cp2016.pagerank.common.TitleLinkPair;
@@ -19,24 +19,21 @@ public class App {
     	Configuration config = new Configuration();
     	config.set("mapreduce.output.textoutputformat.separator", "\t");
     	
-    	FileSystem fs = FileSystem.get(config);
-    	long count = fs.getContentSummary(new Path("tmp/titles")).getFileCount();
-    	config.setLong("numberOfTitles", count);
-    	
-		Job job = Job.getInstance(config, "LinkFilter");
+		Job job = Job.getInstance(config, "Sorter");
 		job.setJarByClass(App.class);
 
 		job.setMapperClass(RowMapper.class);
+		job.setReducerClass(RowReducer.class);
 		
-		job.setMapOutputKeyClass(IntWritable.class);
-		job.setMapOutputValueClass(TitleLinkPair.class);
+		job.setMapOutputKeyClass(TitleRankPair.class);
+		job.setMapOutputValueClass(DoubleWritable.class);
 		
-		job.setOutputKeyClass(TitleRankPair.class);
-		job.setOutputValueClass(Text.class);
+		job.setOutputKeyClass(Text.class);
+		job.setOutputValueClass(DoubleWritable.class);
 
-		job.setNumReduceTasks(0);
+		job.setNumReduceTasks(1);
 		
-		FileInputFormat.addInputPath(job, new Path(args[0]));
+		TextInputFormat.addInputPath(job, new Path(args[0]));
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
 		System.exit(job.waitForCompletion(true) ? 0 : 1);
