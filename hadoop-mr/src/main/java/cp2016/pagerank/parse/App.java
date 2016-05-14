@@ -17,6 +17,9 @@ public class App {
     	Configuration config = new Configuration();
     	config.set("mapreduce.output.textoutputformat.separator", "\t");
     	
+    	int numReducers = 30;
+    	config.setInt("numReducers", numReducers);
+    	
 		Job job = Job.getInstance(config, "XMLParser");
 		job.setJarByClass(App.class);
 
@@ -29,7 +32,7 @@ public class App {
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
 
-		job.setNumReduceTasks(1);
+		job.setNumReduceTasks(numReducers);
 		
 		TextInputFormat.addInputPath(job, new Path(args[0]));
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
