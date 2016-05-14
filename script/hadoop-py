@@ -15,8 +15,8 @@ def main():
     sp.check_output([containing_dir + '/iterate-hadoop', hdfs_dirs[0], hdfs_dirs[1]])
 
     while True:
-        old_results = parse_result(sp.check_output(['hdfs', 'dfs', 'cat', 'tmp/' + hdfs_dirs[0] + '/part-*']))
-        new_results = parse_result(sp.check_output(['hdfs', 'dfs', 'cat', 'tmp/' + hdfs_dirs[1] + '/part-*']))
+        old_results = parse_result(sp.check_output(['hdfs', 'dfs', '-cat', 'tmp/' + hdfs_dirs[0] + '/part-*']))
+        new_results = parse_result(sp.check_output(['hdfs', 'dfs', '-cat', 'tmp/' + hdfs_dirs[1] + '/part-*']))
 
         diff = 0.0
         for key in old_results.keys():
