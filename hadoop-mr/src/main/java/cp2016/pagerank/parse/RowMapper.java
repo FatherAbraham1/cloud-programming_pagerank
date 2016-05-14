@@ -84,7 +84,10 @@ public class RowMapper extends Mapper<LongWritable, Text, IntWritable, TitleLink
 				}
 			}
 			
-			links.add(WordUtils.capitalize(StringEscapeUtils.unescapeXml(linkContent)));
+			String finalLink = WordUtils.capitalize(StringEscapeUtils.unescapeXml(linkContent)).trim();
+			if (!finalLink.isEmpty()){
+				links.add(finalLink);
+			}
 			
 		}
 		return links;

@@ -27,6 +27,7 @@ public class App {
 		job.setJarByClass(App.class);
 
 		job.setMapperClass(RowMapper.class);
+		job.setSortComparatorClass(SortComparator.class);
 		
 		job.setMapOutputKeyClass(IntWritable.class);
 		job.setMapOutputValueClass(TitleLinkPair.class);
