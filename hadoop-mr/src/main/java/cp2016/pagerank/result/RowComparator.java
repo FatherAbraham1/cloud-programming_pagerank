@@ -6,11 +6,12 @@ import org.apache.hadoop.io.WritableComparator;
 import cp2016.pagerank.common.TitleRankPair;
 
 public class RowComparator extends WritableComparator {
-	
+
 	public RowComparator() {
 		super(TitleRankPair.class);
 	}
-	
+
+  @Override
 	public int compare(WritableComparable lhs, WritableComparable rhs) {
 		TitleRankPair left = (TitleRankPair) lhs;
 		TitleRankPair right = (TitleRankPair) rhs;
