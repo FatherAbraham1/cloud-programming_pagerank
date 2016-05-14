@@ -28,6 +28,7 @@ public class RowReducer extends Reducer<IntWritable, TitleLinkPair, Text, Text> 
 			fs.create(path, true);
 			
 			context.write(new Text(title), new Text(p.getLinksJSON()));
+			System.gc();
 		}
 		
 	}
