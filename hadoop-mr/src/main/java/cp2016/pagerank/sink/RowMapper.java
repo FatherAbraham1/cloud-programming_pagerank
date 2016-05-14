@@ -17,7 +17,9 @@ public class RowMapper extends Mapper<LongWritable, Text, IntWritable, DoubleWri
 		for(String val : vals) {
 			String[] stuffs = val.split("\t");
 			if (stuffs.length == 3) {
-				context.write(new IntWritable(0), new DoubleWritable(Double.parseDouble(stuffs[1])));
+				if (stuffs[2].equals("[]")) {
+					context.write(new IntWritable(0), new DoubleWritable(Double.parseDouble(stuffs[1])));
+				}
 			}
 		}
 	}

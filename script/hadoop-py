@@ -23,7 +23,7 @@ def main():
             old_val = old_results[key]
             new_val = new_results[key]
             diff += abs(old_val - new_val)
-            print(str(old_val) + '-->' + str(new_val))
+            print(str(old_val) + ' -> ' + str(new_val))
 
         print(diff)
 
