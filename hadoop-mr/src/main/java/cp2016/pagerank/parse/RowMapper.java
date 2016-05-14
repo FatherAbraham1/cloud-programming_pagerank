@@ -20,7 +20,7 @@ import cp2016.pagerank.common.TitleLinkPair;
 public class RowMapper extends Mapper<LongWritable, Text, IntWritable, TitleLinkPair> {
 	
 	private final Pattern titlePattern = Pattern.compile("<title>.+</title>");
-	private final Pattern textPattern = Pattern.compile("<text.*?>.+</text>");
+	private final Pattern textPattern = Pattern.compile("<text xml:space=\"preserve\">.+</text>");
 	private final Pattern linkPattern = Pattern.compile("\\[\\[[^\\]]+\\]\\]");
 	
 	@Override
@@ -35,7 +35,7 @@ public class RowMapper extends Mapper<LongWritable, Text, IntWritable, TitleLink
 				Matcher titleMatcher = titlePattern.matcher(val);
 				if (titleMatcher.find()) {
 					title = titleMatcher.group();
-					title = title.substring(8, title.length() - 8);
+					title = title.substring(7, title.length() - 8);
 					title = StringEscapeUtils.unescapeXml(title);
 					title = WordUtils.capitalize(title);
 				}
@@ -44,7 +44,8 @@ public class RowMapper extends Mapper<LongWritable, Text, IntWritable, TitleLink
 				Matcher textMatcher = textPattern.matcher(val);
 				if (textMatcher.find()) {
 					text = textMatcher.group();
-					text = text.substring(7, text.length() - 7);
+					text = text.substring(27, text.length() - 7);
+					text = StringEscapeUtils.unescapeXml(text);
 				}
 				
 				if (title == null) {
