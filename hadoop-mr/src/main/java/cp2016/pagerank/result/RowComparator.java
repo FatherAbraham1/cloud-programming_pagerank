@@ -19,7 +19,7 @@ public class RowComparator extends WritableComparator {
 		if (result != 0) {
 			return result;
 		} else {
-			return right.getTitle().compareTo(left.getTitle());
+			return left.getTitle().compareTo(right.getTitle());
 		}
 	}
 }
