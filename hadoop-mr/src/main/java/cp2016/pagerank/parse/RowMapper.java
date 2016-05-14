@@ -3,7 +3,6 @@ package cp2016.pagerank.parse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,14 +26,7 @@ public class RowMapper extends Mapper<LongWritable, Text, IntWritable, TitleLink
 	@Override
 	public void map(LongWritable key, Text value, Context context)
 			throws IOException, InterruptedException {
-		int numReducers = context.getConfiguration().getInt("numReducers", 0);
-		
-		if (numReducers == 0) {
-			throw new RuntimeException("Number of reducers is 0!");
-		}
-		
-		Random randomGenerator = new Random();
-		
+
 		String[] vals = value.toString().split("\n");
 		for (String val : vals) {
 			if (val == null || val.isEmpty()) {
@@ -66,7 +58,7 @@ public class RowMapper extends Mapper<LongWritable, Text, IntWritable, TitleLink
 					links = parseLinks(text);
 				}
 				
-				context.write(new IntWritable(randomGenerator.nextInt(numReducers)), new TitleLinkPair(title, JSON.toJSONString(links)));
+				context.write(new IntWritable(0), new TitleLinkPair(title, JSON.toJSONString(links)));
 			}
 		}
 	}

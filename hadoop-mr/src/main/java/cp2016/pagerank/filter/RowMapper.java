@@ -3,9 +3,10 @@ package cp2016.pagerank.filter;
 import cp2016.pagerank.common.*;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Base64.Encoder;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -28,7 +29,6 @@ public class RowMapper extends Mapper<LongWritable, Text, TitleRankPair, Text> {
 		}
 		
 		FileSystem fs = FileSystem.get(context.getConfiguration());	
-		Encoder encoder = java.util.Base64.getUrlEncoder();
 		
 		String[] records = value.toString().split("\n");
 		for (String r : records) {
@@ -40,7 +40,7 @@ public class RowMapper extends Mapper<LongWritable, Text, TitleRankPair, Text> {
 			List<String> validLinks = new ArrayList<>();
 			
 			for (String link : links) {
-				Path path = new Path("tmp/titles/" + encoder.encodeToString(link.getBytes()));
+				Path path = new Path("tmp/titles/" + URLEncoder.encode(link, StandardCharsets.UTF_8.name()));
 				if (fs.exists(path)) {
 					validLinks.add(link);
 				}

@@ -1,14 +1,14 @@
 package cp2016.pagerank.parse;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
-
-import java.util.Base64.*;
 
 import cp2016.pagerank.common.TitleLinkPair;
 
@@ -20,12 +20,11 @@ public class RowReducer extends Reducer<IntWritable, TitleLinkPair, Text, Text> 
 			throws IOException, InterruptedException {
 		
 		FileSystem fs = FileSystem.get(context.getConfiguration());	
-		Encoder encoder = java.util.Base64.getUrlEncoder();
 		
 		for (TitleLinkPair p : values) {
 			String title = p.getTitle();
 			
-			Path path = new Path("tmp/titles/" + encoder.encodeToString(title.getBytes()));
+			Path path = new Path("tmp/titles/" + URLEncoder.encode(title, StandardCharsets.UTF_8.name()));
 			fs.create(path, true);
 			
 			context.write(new Text(title), new Text(p.getLinksJSON()));

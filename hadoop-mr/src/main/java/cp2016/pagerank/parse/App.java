@@ -17,14 +17,13 @@ public class App {
     	Configuration config = new Configuration();
     	config.set("mapreduce.output.textoutputformat.separator", "\t");
     	
-    	int numReducers = 30;
-    	config.setInt("numReducers", numReducers);
-    	
 		Job job = Job.getInstance(config, "XMLParser");
 		job.setJarByClass(App.class);
 
 		job.setMapperClass(RowMapper.class);
 		job.setReducerClass(RowReducer.class);
+		
+		job.setPartitionerClass(Spliter.class);
 		
 		job.setMapOutputKeyClass(IntWritable.class);
 		job.setMapOutputValueClass(TitleLinkPair.class);
@@ -32,7 +31,7 @@ public class App {
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
 
-		job.setNumReduceTasks(numReducers);
+		job.setNumReduceTasks(30);
 		
 		TextInputFormat.addInputPath(job, new Path(args[0]));
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
