@@ -48,7 +48,6 @@ public class RowMapper extends Mapper<LongWritable, Text, IntWritable, TitleLink
 					text = StringEscapeUtils.unescapeXml(text);
 				}
 
-        System.out.println(title);
 				if (title == null) {
 					continue;
 				}
@@ -64,7 +63,13 @@ public class RowMapper extends Mapper<LongWritable, Text, IntWritable, TitleLink
 	}
 
   private String capString(String input) {
-    return input.substring(0, 1).toUpperCase() + input.substring(1);
+    if (input.length() == 0) {
+      return input;
+    } else if (input.length() > 1) {
+      return input.substring(0, 1).toUpperCase() + input.substring(1);
+    } else {
+      return input.toUpperCase();
+    }
   }
 
 	private List<String> parseLinks(String content) {

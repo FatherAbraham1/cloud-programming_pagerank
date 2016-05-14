@@ -15,11 +15,11 @@ public class RowComparator extends WritableComparator {
 	public int compare(WritableComparable lhs, WritableComparable rhs) {
 		TitleRankPair left = (TitleRankPair) lhs;
 		TitleRankPair right = (TitleRankPair) rhs;
-		int result = Double.compare(left.getRank(), right.getRank());
+		int result = Double.compare(right.getRank(), left.getRank());
 		if (result != 0) {
 			return result;
 		} else {
-			return left.getTitle().compareTo(right.getTitle());
+			return right.getTitle().compareTo(left.getTitle());
 		}
 	}
 }
