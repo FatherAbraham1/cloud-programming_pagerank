@@ -31,6 +31,7 @@ def main():
             break
 
         hdfs_dirs = hdfs_dirs[::-1]
+        sp.check_output([containing_dir + '/hadoop-sink-score', hdfs_dirs[0]])
         sp.check_output([containing_dir + '/iterate-hadoop', hdfs_dirs[0], hdfs_dirs[1]])
 
 
