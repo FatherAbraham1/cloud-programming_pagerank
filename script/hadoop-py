@@ -4,7 +4,7 @@ import os.path
 def parse_result(raw_str):
     result = {}
     for line in raw_str.split('\n'):
-        vals = line.split('\n')
+        vals = line.split('\t')
         if len(vals) == 3:
             result[vals[0]] = float(vals[1])
     return result
