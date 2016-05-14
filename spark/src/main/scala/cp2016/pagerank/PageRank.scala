@@ -22,12 +22,12 @@ object PageRank {
         println(ex.getMessage)
       }
     }
-    
+
     val pages = ctx.textFile(inputPath, ctx.defaultParallelism)
-    
+
     val linkPattern = """\[\[[^\]]+\]\]""".r
     val linkSplitPattern = "[#|]"
-    val adjMatrix = pages.map { line =>  
+    val adjMatrix = pages.map { line =>
       val xml = XML.loadString(line)
       val text = (xml \ "text").text
       var links = ctx.parallelize(linkPattern.findAllIn(text).toList, ctx.defaultParallelism)
@@ -36,9 +36,9 @@ object PageRank {
       }.filter { link => !link.isEmpty() }
       ((xml \ "title").text, links)
     }
-    
-    adjMatrix.map { a => (a._1, a._2.toString()) }.saveAsTextFile(outputDir)
-    
+
+    // adjMatrix.map { a => (a._1, a._2.toString()) }.saveAsTextFile(outputDir)
+
     ctx.stop
   }
 }
