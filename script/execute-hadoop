@@ -9,9 +9,8 @@ hdfs dfs -mkdir -p tmp
 hdfs dfs -mkdir -p tmp/titles
 
 hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.parse.App $1 tmp/init
-hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.filter.App tmp/init tmp/previous
-hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.sink.App tmp/previous tmp/dummy
+hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.filter.App tmp/init tmp/one
 
-hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.iterate.App tmp/previous tmp/current
+$BASEDIR/hadoop-sink-score one
 
-hdfs dfs -cat tmp/sinkNodeScore
+python $BASEDIR/hadoop-py

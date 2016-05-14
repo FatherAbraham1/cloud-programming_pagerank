@@ -1,0 +1,10 @@
+import subprocess
+
+def main():
+    containing_dir = __file__
+    current_hdfs_dir = 'one'
+    next_hdfs_dir = 'two'
+    subprocess.call([containing_dir + 'iterate-hadoop' + ' ' + current_hdfs_dir + ' ' + next_hdfs_dir])
+
+if __name__ == '__main__':
+    main()

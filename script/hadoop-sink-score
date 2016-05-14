@@ -1,0 +1,5 @@
+#!/bin/sh
+
+hdfs dfs -rm -f -r tmp/dummy
+
+hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.sink.App tmp/$1 tmp/dummy
