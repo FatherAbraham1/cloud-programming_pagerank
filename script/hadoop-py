@@ -14,6 +14,8 @@ def main():
     hdfs_dirs = ['one', 'two']
     sp.check_output([containing_dir + '/iterate-hadoop', hdfs_dirs[0], hdfs_dirs[1]])
 
+    log_file = open('./diff.log', 'w+')
+
     while True:
         old_results = parse_result(sp.check_output(['hdfs', 'dfs', '-cat', 'tmp/' + hdfs_dirs[0] + '/part-*']))
         new_results = parse_result(sp.check_output(['hdfs', 'dfs', '-cat', 'tmp/' + hdfs_dirs[1] + '/part-*']))
@@ -24,8 +26,8 @@ def main():
             new_val = new_results[key]
             diff += abs(old_val - new_val)
 
-        print(diff)
-
+        log_file.write(str(diff) + '\n')
+        
         if diff < 0.001:
             sp.check_output(['hdfs', 'dfs', '-cp', 'tmp/' + hdfs_dirs[1], 'tmp/stable'])
             break

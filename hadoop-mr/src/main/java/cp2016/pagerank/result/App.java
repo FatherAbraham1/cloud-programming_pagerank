@@ -23,6 +23,8 @@ public class App {
 		job.setJarByClass(App.class);
 
 		job.setMapperClass(RowMapper.class);
+		job.setSortComparatorClass(RowComparator.class);
+		
 		job.setReducerClass(RowReducer.class);
 		
 		job.setMapOutputKeyClass(TitleRankPair.class);
