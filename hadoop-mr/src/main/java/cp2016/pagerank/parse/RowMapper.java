@@ -18,11 +18,11 @@ import com.alibaba.fastjson.JSON;
 import cp2016.pagerank.common.TitleLinkPair;
 
 public class RowMapper extends Mapper<LongWritable, Text, IntWritable, TitleLinkPair> {
-	
+
 	private final Pattern titlePattern = Pattern.compile("<title>.+</title>");
 	private final Pattern textPattern = Pattern.compile("<text xml:space=\"preserve\">.+</text>");
 	private final Pattern linkPattern = Pattern.compile("\\[\\[[^\\]]+\\]\\]");
-	
+
 	@Override
 	public void map(LongWritable key, Text value, Context context)
 			throws IOException, InterruptedException {
@@ -40,7 +40,7 @@ public class RowMapper extends Mapper<LongWritable, Text, IntWritable, TitleLink
 					title = StringEscapeUtils.unescapeXml(title);
 					title = WordUtils.capitalize(title);
 				}
-				
+
 				String text = null;
 				Matcher textMatcher = textPattern.matcher(val);
 				if (textMatcher.find()) {
@@ -48,21 +48,22 @@ public class RowMapper extends Mapper<LongWritable, Text, IntWritable, TitleLink
 					text = text.substring(27, text.length() - 7);
 					text = StringEscapeUtils.unescapeXml(text);
 				}
-				
+
 				if (title == null) {
+          System.out.println(val);
 					continue;
 				}
-				
+
 				List<String> links = new ArrayList<>();
 				if (text != null) {
 					links = parseLinks(text);
 				}
-				
+
 				context.write(new IntWritable(0), new TitleLinkPair(title, JSON.toJSONString(links)));
 			}
 		}
 	}
-	
+
 	private List<String> parseLinks(String content) {
 		List<String> links = new ArrayList<>();
 		Matcher linkMatcher = linkPattern.matcher(content);
@@ -76,19 +77,19 @@ public class RowMapper extends Mapper<LongWritable, Text, IntWritable, TitleLink
 					linkContent = tmp[0];
 				}
 			}
-			
+
 			{
 				String[] tmp = linkContent.split("#");
 				if (tmp.length > 0) {
 					linkContent = tmp[0];
 				}
 			}
-			
+
 			String finalLink = WordUtils.capitalize(StringEscapeUtils.unescapeXml(linkContent)).trim();
 			if (!finalLink.isEmpty()){
 				links.add(finalLink);
 			}
-			
+
 		}
 		return links;
 	}
