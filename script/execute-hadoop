@@ -12,4 +12,6 @@ hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.parse.App $1 tmp/init
 hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.filter.App tmp/init tmp/previous
 hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.sink.App tmp/previous tmp/dummy
 
+hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.iterate.App tmp/previous tmp/current
+
 hdfs dfs -cat tmp/sinkNodeScore

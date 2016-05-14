@@ -31,7 +31,7 @@ public class App {
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
 
-		job.setNumReduceTasks(30);
+		job.setNumReduceTasks(64);
 		
 		TextInputFormat.addInputPath(job, new Path(args[0]));
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
