@@ -87,7 +87,7 @@ public class RowMapper extends Mapper<LongWritable, Text, IntWritable, TitleLink
 				}
 			}
 
-			String finalLink = capString(StringEscapeUtils.unescapeXml(linkContent)).trim();
+			String finalLink = capString(StringEscapeUtils.unescapeXml(linkContent).trim());
 			if (!finalLink.isEmpty()){
 				links.add(finalLink);
 			}
