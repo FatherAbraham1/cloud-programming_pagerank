@@ -7,7 +7,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang3.text.WordUtils;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -38,7 +37,7 @@ public class RowMapper extends Mapper<LongWritable, Text, IntWritable, TitleLink
 					title = titleMatcher.group();
 					title = title.substring(7, title.length() - 8);
 					title = StringEscapeUtils.unescapeXml(title);
-					title = WordUtils.capitalize(title);
+					title = capString(title);
 				}
 
 				String text = null;
@@ -64,6 +63,10 @@ public class RowMapper extends Mapper<LongWritable, Text, IntWritable, TitleLink
 		}
 	}
 
+  private String capString(String input) {
+    return input.substring(0, 1).toUpperCase() + input.substring(1);
+  }
+
 	private List<String> parseLinks(String content) {
 		List<String> links = new ArrayList<>();
 		Matcher linkMatcher = linkPattern.matcher(content);
@@ -84,7 +87,7 @@ public class RowMapper extends Mapper<LongWritable, Text, IntWritable, TitleLink
 				}
 			}
 
-			String finalLink = WordUtils.capitalize(StringEscapeUtils.unescapeXml(linkContent)).trim();
+			String finalLink = capString(StringEscapeUtils.unescapeXml(linkContent)).trim();
 			if (!finalLink.isEmpty()){
 				links.add(finalLink);
 			}
