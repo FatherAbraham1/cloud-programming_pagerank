@@ -1,11 +1,35 @@
-import subprocess
+import subprocess as sp
 import os.path
+
+def parse_result(raw_str):
+    result = {}
+    for line in raw_str.split('\n'):
+        vals = line.split('\n')
+        if len(vals) == 3:
+            result[vals[0]] = float(vals[1])
+    return result
 
 def main():
     containing_dir = os.path.abspath(os.path.join(__file__, os.pardir))
-    current_hdfs_dir = 'one'
-    next_hdfs_dir = 'two'
-    subprocess.call([containing_dir + '/iterate-hadoop', current_hdfs_dir, next_hdfs_dir])
+    hdfs_dirs = ['one', 'two']
+    sp.check_output([containing_dir + '/iterate-hadoop', hdfs_dirs[0], hdfs_dirs[1]])
+
+    while True:
+        old_results = parse_result(sp.check_output(['hdfs', 'dfs', 'cat', 'tmp/' + hdfs_dirs[0] + '/part-*']))
+        new_results = parse_result(sp.check_output(['hdfs', 'dfs', 'cat', 'tmp/' + hdfs_dirs[1] + '/part-*']))
+
+        diff = 0.0
+        for key in old_results.keys():
+            old_val = old_results[key]
+            new_val = new_results[key]
+            diff += abs(old_val - new_val)
+
+        if diff < 0.001:
+            break
+
+        hdfs_dirs = hdfs_dirs[::-1]
+        sp.check_output([containing_dir + '/iterate-hadoop', hdfs_dirs[0], hdfs_dirs[1]])
+
 
 if __name__ == '__main__':
     main()
