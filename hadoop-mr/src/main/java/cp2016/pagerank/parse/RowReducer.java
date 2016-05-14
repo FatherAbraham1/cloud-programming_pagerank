@@ -1,9 +1,7 @@
 package cp2016.pagerank.parse;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -13,6 +11,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import cp2016.pagerank.common.TitleLinkPair;
 
 public class RowReducer extends Reducer<IntWritable, TitleLinkPair, Text, Text> {
+	
 	
 	@Override
 	public void reduce(IntWritable key,
@@ -24,7 +23,7 @@ public class RowReducer extends Reducer<IntWritable, TitleLinkPair, Text, Text> 
 		for (TitleLinkPair p : values) {
 			String title = p.getTitle();
 			
-			Path path = new Path("tmp/titles/" + URLEncoder.encode(title, StandardCharsets.UTF_8.name()));
+			Path path = new Path("tmp/titles/" + DigestUtils.sha256Hex(title));
 			fs.create(path, true);
 			
 			context.write(new Text(title), new Text(p.getLinksJSON()));

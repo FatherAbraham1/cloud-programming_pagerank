@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -40,7 +41,7 @@ public class RowMapper extends Mapper<LongWritable, Text, TitleRankPair, Text> {
 			List<String> validLinks = new ArrayList<>();
 			
 			for (String link : links) {
-				Path path = new Path("tmp/titles/" + URLEncoder.encode(link, StandardCharsets.UTF_8.name()));
+				Path path = new Path("tmp/titles/" + DigestUtils.sha256Hex(link));
 				if (fs.exists(path)) {
 					validLinks.add(link);
 				}
