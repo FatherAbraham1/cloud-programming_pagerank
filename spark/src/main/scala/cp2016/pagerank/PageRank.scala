@@ -32,7 +32,8 @@ object PageRank {
       val title = (xml \\ "title").text.capitalize
       val text = (xml \\ "text").text
       var links = linkPattern.findAllIn(text).toList.map { link =>
-        (title, link.substring(2, link.length() - 2).split(linkSplitPattern)(0).capitalize)
+        val tokens = link.substring(2, link.length() - 2).split(linkSplitPattern)
+        (title, tokens(0).capitalize)
       }
       links.union(List((title, "")))
     }
