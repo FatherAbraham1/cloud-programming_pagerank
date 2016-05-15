@@ -63,7 +63,7 @@ object PageRank {
     
       val teleport = 0.15 * (1.0 / numDocs.value);
       
-      val matz = adjMat.flatMap { tup =>
+      var matz = adjMat.flatMap { tup =>
         val neighbors = tup._2._2
         val pr = tup._2._1
         neighbors.map { n =>
@@ -80,7 +80,7 @@ object PageRank {
                  .reduceByKey((a, b) =>(math.abs(a._1 - b._1), List()), ctx.defaultParallelism * 3)
                  .map(tup => tup._2._1).sum()
       
-      adjMat = matz.map(x => x)
+      adjMat = matz
     } while(diff >= 0.001)
     
     adjMat.sortBy(tup => (-tup._2._1, tup._1), true, ctx.defaultParallelism * 3)
