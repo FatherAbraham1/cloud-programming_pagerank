@@ -35,7 +35,7 @@ object PageRank {
         (title, link.substring(2, link.length() - 2).split(linkSplitPattern)(0))
       }.filter { tup => !tup._2.isEmpty() }
     }
-
+    println(adjMatrix)
     adjMatrix.saveAsTextFile(outputDir)
 
     ctx.stop
