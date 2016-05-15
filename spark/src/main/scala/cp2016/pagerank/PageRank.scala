@@ -79,9 +79,9 @@ object PageRank {
         ((a._1 + b._1), a._2 ++ b._2)
       }.map(tup => (tup._1, (tup._2._1 + snkVal.value + teleport.value, tup._2._2)))
       
-      //diff = matz.union(adjMat).reduceByKey { (a, b) =>
-      //  (math.abs(a._1 - b._1), List())
-      //}.map(tup => tup._2._1).sum()
+      diff = matz.union(adjMat).reduceByKey { (a, b) =>
+        (math.abs(a._1 - b._1), List())
+      }.map(tup => tup._2._1).sum()
       
       matz.unpersist(false)
       
