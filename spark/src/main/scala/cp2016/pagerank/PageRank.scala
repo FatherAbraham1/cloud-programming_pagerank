@@ -48,9 +48,11 @@ object PageRank {
                          .filter(x => x._1 == 0 || !x._2._2.isEmpty)
                          .filter(x => !x._2._2.exists(e => e == ""))
                          .map(x => (x._2._1, x._1))
-                         
+                      
+    adjMatrix.saveAsTextFile(outputDir)
+    return
     var tmpAdjMat = adjMatrix.map(tup => (tup._1, List(tup._2)))
-                             .reduceByKey(_ ++ _)
+                             .reduceByKey(_ ++ _, ctx.defaultParallelism * 3)
     
     var adjMat = tmpAdjMat.map(tup => (tup._1, (1.0 / n, tup._2)))
     var diff = 0.0
