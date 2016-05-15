@@ -61,7 +61,7 @@ object PageRank {
       sinkNodeRankSum = sinkNodeRankSum / numDocs.value * 0.85
     
       val teleport = 0.15 * (1.0 / numDocs.value);
-    
+      
       val matz = adjMat.flatMap { tup =>
         val neighbors = tup._2._2
         val pr = tup._2._1
@@ -72,13 +72,12 @@ object PageRank {
             (n, (pr / (neighbors.size - 1) * 0.85, List()))
           }
         }
-      }.reduceByKey{ (a, b) => 
-        ((a._1 + b._1), a._2 ++ b._2)
-      }.map(tup => (tup._1, (tup._2._1 + sinkNodeRankSum + teleport, tup._2._2)))
+      }.reduceByKey((a, b) => ((a._1 + b._1), a._2 ++ b._2), ctx.defaultParallelism * 3)
+       .map(tup => (tup._1, (tup._2._1 + sinkNodeRankSum + teleport, tup._2._2)))
       
-      diff = matz.union(adjMat).reduceByKey { (a, b) =>
-        (math.abs(a._1 - b._1), List())
-      }.map(tup => tup._2._1).sum()
+      diff = matz.union(adjMat)
+                 .reduceByKey((a, b) =>(math.abs(a._1 - b._1), List()), ctx.defaultParallelism * 3)
+                 .map(tup => tup._2._1).sum()
       
       ctx.parallelize(List((iter.toString() + " : " + diff.toString())), 1).saveAsTextFile("tmp/iter" + iter.toString())
       iter += 1
