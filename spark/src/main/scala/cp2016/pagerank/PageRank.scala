@@ -31,19 +31,20 @@ object PageRank {
       val xml = XML.loadString(line)
       val title = (xml \\ "title").text.capitalize
       val text = (xml \\ "text").text
-      linkPattern.findAllIn(text).toList.map { link =>
+      var links = linkPattern.findAllIn(text).toList.map { link =>
         (title, link.substring(2, link.length() - 2).split(linkSplitPattern)(0).capitalize)
       }
+      links.union(List((title, "")))
     }
     
     val keySet = adjMatrix.map(_._1)
     val keys = ctx.broadcast(keySet.collect().toSet)
     
     adjMatrix = adjMatrix.filter {
-      case (_, link) => keys.value.contains(link)
+      case (_, link) => keys.value.contains(link) || link.isEmpty()
     }
     
-    adjMatrix.saveAsTextFile(outputDir)
+    adjMatrix.map(_._1).distinct().saveAsTextFile(outputDir)
 
     ctx.stop
   }
