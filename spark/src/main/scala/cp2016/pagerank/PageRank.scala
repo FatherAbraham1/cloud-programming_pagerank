@@ -69,11 +69,13 @@ object PageRank {
                           .filter(tup => tup._1.size > 1)
                           .flatMap { case (links, rank) =>
                             val size = links.size
-                            links.map(x => (x, rank / size))
+                            links.filter(x => x != "")
+                                 .map(x => (x, rank / size))
                            }
       val newRanks = updates.reduceByKey(_ + _).map(x => (x._1, teleport + 0.85 * x._2 + sinkNodeRankSum))
       
       diff = ranks.join(newRanks).map(x => math.abs(x._2._1 - x._2._2)).sum()
+      println("diff = " + diff.toString())
       ranks = newRanks
       
       val end = System.nanoTime()
