@@ -42,7 +42,7 @@ object PageRank {
                              .toArray
                              .map { link => link.substring(2, link.length() - 2).split(linkSplitPattern) }
                              .filter { arr => arr.size > 0 }
-                             .map { arr => (title, arr(0).capitalize) }
+                             .map { arr => (title, unescape(arr(0)).capitalize) }
 
       links.union(Array((title, "")))
     }
