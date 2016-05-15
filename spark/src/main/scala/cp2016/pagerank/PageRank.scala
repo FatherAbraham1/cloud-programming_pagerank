@@ -73,8 +73,8 @@ object PageRank {
                             links.filter(x => x != "")
                                  .map(x => (x, rank / size))
                            }
-      val newRanks = updates.reduceByKey(_ + _).map(x => (x._1, teleport + 0.85 * x._2 + sinkNodeRankSum))
-      
+      var newRanks = updates.reduceByKey(_ + _)
+      newRanks = ranks.fullOuterJoin(newRanks).map(x => (x._1, x._2._2.getOrElse(0.0) * 0.85 + teleport + sinkNodeRankSum))
       diff = ranks.join(newRanks).map(x => math.abs(x._2._1 - x._2._2)).sum()
       println("diff = " + diff.toString())
       ranks = newRanks
