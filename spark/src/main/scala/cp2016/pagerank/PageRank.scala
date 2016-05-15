@@ -56,6 +56,7 @@ object PageRank {
     var diff = 0.0
     var iter = 0
     do {
+      val begin = System.nanoTime()
       var sinkNodeRankSum = adjMat.filter(tup => tup._2._2.size == 1)
                                 .map(tup => tup._2._1)
                                 .sum
@@ -81,6 +82,8 @@ object PageRank {
                  .map(tup => tup._2._1).sum()
       
       adjMat = matz
+      val end = System.nanoTime()
+      println(end - begin)
     } while(diff >= 0.001)
     
     adjMat.sortBy(tup => (-tup._2._1, tup._1), true, ctx.defaultParallelism * 12)
