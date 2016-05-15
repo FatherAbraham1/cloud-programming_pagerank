@@ -70,7 +70,7 @@ object PageRank {
                           .flatMap { case (links, rank) =>
                             val size = links.size
                             links.filter(x => x != "")
-                                 .map(x => (x, rank / size - 1))
+                                 .map(x => (x, rank / (size - 1)))
                            }
       var newRanks = updates.reduceByKey(_ + _)
       newRanks = ranks.fullOuterJoin(newRanks).map(x => (x._1, x._2._2.getOrElse(0.0) * 0.85 + teleport + sinkNodeRankSum))
