@@ -30,8 +30,7 @@ object PageRank {
     var adjMatrix = pages.flatMap { line =>
       val xml = XML.loadString(line)
       val title = (xml \\ "title").text.capitalize
-      val text = (xml \\ "text").text
-      var links = linkPattern.findAllIn(text)
+      var links = linkPattern.findAllIn(line)
                              .toList
                              .map { link => link.substring(2, link.length() - 2).split(linkSplitPattern) }
                              .filter { arr => arr.size > 0 }
