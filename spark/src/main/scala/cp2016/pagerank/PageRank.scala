@@ -40,8 +40,7 @@ object PageRank {
     val keySet = adjMatrix.map(_._1).distinct()
     val keys = ctx.broadcast(keySet)
     
-    
-    adjMatrix.join(adjMatrix).map(x => (x._1, x._2._1 + x._2._2)).saveAsTextFile(outputDir)
+    adjMatrix.fullOuterJoin(adjMatrix).map(x => (x._1, "'" + x._2._1 + "' <---> '" + x._2._2 + "'")).saveAsTextFile(outputDir)
 
     ctx.stop
   }
