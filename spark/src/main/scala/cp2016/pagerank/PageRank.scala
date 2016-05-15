@@ -51,7 +51,8 @@ object PageRank {
                       
     val adjMat = adjMatrix.groupByKey().cache()
     var ranks = adjMat.map(x => (x._1, 1.0 / numDocs))
-    
+    ranks.saveAsTextFile(outputDir)
+    return
     var diff = 0.0
     var iter = 0
     do {
