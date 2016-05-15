@@ -24,7 +24,7 @@ object PageRank {
     }
 
     val pages = ctx.textFile(inputPath, ctx.defaultParallelism)
-
+    
     val linkPattern = """\[\[[^\]]+\]\]""".r
     val linkSplitPattern = "[#|]"
     var adjMatrix = pages.flatMap { line =>
@@ -40,8 +40,8 @@ object PageRank {
       links.union(List((title, "")))
     }
     
-    val n = adjMatrix.map(_._1).distinct().map(_ => 1).sum()
-    val numDocs = ctx.broadcast(n) 
+    val numDocs = adjMatrix.map(_._1).distinct().map(_ => 1).sum() 
+    val teleport = 0.15 * (1.0 / numDocs)
     
     adjMatrix = adjMatrix.map(x => (x._2, x._1))
                          .leftOuterJoin(adjMatrix, ctx.defaultParallelism * 12)
@@ -49,45 +49,35 @@ object PageRank {
                          .filter(x => !x._2._2.exists(e => e == ""))
                          .map(x => (x._2._1, x._1))
                       
-    var tmpAdjMat = adjMatrix.map(tup => (tup._1, List(tup._2)))
-                             .reduceByKey(_ ++ _, ctx.defaultParallelism * 12)
+    val adjMat = adjMatrix.groupByKey().cache()
+    var ranks = adjMat.map(x => (x._1, 1.0 / numDocs))
     
-    var adjMat = tmpAdjMat.map(tup => (tup._1, (1.0 / n, tup._2)))
     var diff = 0.0
     var iter = 0
     do {
       val begin = System.nanoTime()
-      var sinkNodeRankSum = adjMat.filter(tup => tup._2._2.size == 1)
-                                .map(tup => tup._2._1)
-                                .sum
-      sinkNodeRankSum = sinkNodeRankSum / numDocs.value * 0.85
+      var sinkNodeRankSum = adjMat.zip(ranks)
+                                  .filter(tup => tup._1._2.size == 1)
+                                  .map(tup => tup._2._2)
+                                  .sum()
+      sinkNodeRankSum = sinkNodeRankSum / numDocs * 0.85
     
-      val teleport = 0.15 * (1.0 / numDocs.value);
       
-      var matz = adjMat.flatMap { tup =>
-        val neighbors = tup._2._2
-        val pr = tup._2._1
-        neighbors.map { n =>
-          if (n.size == 0) {
-            (tup._1, (0.0, neighbors))
-          } else {
-            (n, (pr / (neighbors.size - 1) * 0.85, List()))
-          }
-        }
-      }.reduceByKey((a, b) => ((a._1 + b._1), a._2 ++ b._2), adjMat.getNumPartitions)
-       .map(tup => (tup._1, (tup._2._1 + sinkNodeRankSum + teleport, tup._2._2)))
+      val updates = adjMat.join(ranks)
+                          .values
+                          .filter(tup => tup._1.size > 1)
+                          .flatMap { case (links, rank) =>
+                            val size = links.size
+                            links.map(x => (x, rank / size))
+                           }
+      ranks = updates.reduceByKey(_ + _).map(x => (x._1, teleport + 0.85 * x._2 + sinkNodeRankSum))
       
-      diff = matz.union(adjMat)
-                 .reduceByKey((a, b) =>(math.abs(a._1 - b._1), List()), adjMat.getNumPartitions)
-                 .map(tup => tup._2._1).sum()
-      
-      adjMat = matz
       val end = System.nanoTime()
       println(end - begin)
     } while(diff >= 0.001)
     
-    adjMat.sortBy(tup => (-tup._2._1, tup._1), true, ctx.defaultParallelism * 12)
-          .map(tup => tup._1 + "\t" + tup._2._1.toString())
+    ranks.sortBy(tup => (-tup._2, tup._1), true, ctx.defaultParallelism * 12)
+          .map(tup => tup._1 + "\t" + tup._2.toString())
           .saveAsTextFile(outputDir)
           
     try { ctx.stop } catch { case _ : Throwable => {} }
