@@ -44,13 +44,13 @@ object PageRank {
     val numDocs = ctx.broadcast(n) 
     
     adjMatrix = adjMatrix.map(x => (x._2, x._1))
-                         .leftOuterJoin(adjMatrix, ctx.defaultParallelism * 3)
+                         .leftOuterJoin(adjMatrix, ctx.defaultParallelism * 12)
                          .filter(x => x._1 == "" || !x._2._2.isEmpty)
                          .filter(x => !x._2._2.exists(e => e == ""))
                          .map(x => (x._2._1, x._1))
                       
     var tmpAdjMat = adjMatrix.map(tup => (tup._1, List(tup._2)))
-                             .reduceByKey(_ ++ _, ctx.defaultParallelism * 3)
+                             .reduceByKey(_ ++ _, ctx.defaultParallelism * 12)
     
     var adjMat = tmpAdjMat.map(tup => (tup._1, (1.0 / n, tup._2)))
     var diff = 0.0
@@ -73,17 +73,17 @@ object PageRank {
             (n, (pr / (neighbors.size - 1) * 0.85, List()))
           }
         }
-      }.reduceByKey((a, b) => ((a._1 + b._1), a._2 ++ b._2), ctx.defaultParallelism * 3)
+      }.reduceByKey((a, b) => ((a._1 + b._1), a._2 ++ b._2), adjMat.getNumPartitions)
        .map(tup => (tup._1, (tup._2._1 + sinkNodeRankSum + teleport, tup._2._2)))
       
       diff = matz.union(adjMat)
-                 .reduceByKey((a, b) =>(math.abs(a._1 - b._1), List()), ctx.defaultParallelism * 3)
+                 .reduceByKey((a, b) =>(math.abs(a._1 - b._1), List()), adjMat.getNumPartitions)
                  .map(tup => tup._2._1).sum()
       
       adjMat = matz
     } while(diff >= 0.001)
     
-    adjMat.sortBy(tup => (-tup._2._1, tup._1), true, ctx.defaultParallelism * 3)
+    adjMat.sortBy(tup => (-tup._2._1, tup._1), true, ctx.defaultParallelism * 12)
           .map(tup => tup._1 + "\t" + tup._2._1.toString())
           .saveAsTextFile(outputDir)
           
