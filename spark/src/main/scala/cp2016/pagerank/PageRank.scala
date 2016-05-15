@@ -81,7 +81,7 @@ object PageRank {
       
       iter += 1
       // adjMat = matz
-    } while(iter != 3)
+    } while(iter < 3)
     
     adjMat.sortBy(tup => (-tup._2._1, tup._1), true, ctx.defaultParallelism * 3)
           .map(tup => tup._1 + "\t" + tup._2._1.toString())
