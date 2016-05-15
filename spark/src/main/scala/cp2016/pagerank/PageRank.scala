@@ -45,7 +45,7 @@ object PageRank {
     
     adjMatrix = adjMatrix.map(x => (x._2, x._1))
                          .leftOuterJoin(adjMatrix, ctx.defaultParallelism * 3)
-                         .filter(x => x._1 == 0 || !x._2._2.isEmpty)
+                         .filter(x => x._1 == "" || !x._2._2.isEmpty)
                          .filter(x => !x._2._2.exists(e => e == ""))
                          .map(x => (x._2._1, x._1))
                       
