@@ -27,14 +27,13 @@ object PageRank {
 
     val linkPattern = """\[\[[^\]]+\]\]""".r
     val linkSplitPattern = "[#|]"
-    val adjMatrix = pages.map { line =>
+    val adjMatrix = pages.flatMap { line =>
       val xml = XML.loadString(line)
-      val title = (xml \ "title").text
-      val text = (xml \ "text").text
-//      linkPattern.findAllIn(text).toList.map { link =>
-//        (title, link.substring(2, link.length() - 2).split(linkSplitPattern)(0))
-//      }.filter { tup => !tup._2.isEmpty() }
-      (title, text)
+      val title = (xml \\ "title").text
+      val text = (xml \\ "text").text
+      linkPattern.findAllIn(text).toList.map { link =>
+        (title, link.substring(2, link.length() - 2).split(linkSplitPattern)(0))
+      }.filter { tup => !tup._2.isEmpty() }
     }
     println(adjMatrix)
     adjMatrix.saveAsTextFile(outputDir)
