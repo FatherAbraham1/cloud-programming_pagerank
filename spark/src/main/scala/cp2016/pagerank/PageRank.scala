@@ -43,16 +43,12 @@ object PageRank {
     val n = adjMatrix.map(_._1).distinct().map(_ => 1).sum()
     val numDocs = ctx.broadcast(n) 
     
-    val invalidLinks = adjMatrix.fullOuterJoin(adjMatrix)
-                                .filter(x => x._2._2.isEmpty)
-                                .map(x => x._2._1.get).distinct().collect().toSet
     adjMatrix = adjMatrix.map(x => (x._2, x._1))
                          .leftOuterJoin(adjMatrix, ctx.defaultParallelism * 3)
                          .filter(x => x._1 == 0 || !x._2._2.isEmpty)
                          .filter(x => !x._2._2.exists(e => e == ""))
                          .map(x => (x._2._1, x._1))
-    val bye = ctx.broadcast(invalidLinks)
-    adjMatrix = adjMatrix.filter(x => !bye.value.contains(x._2))
+                         
     var tmpAdjMat = adjMatrix.map(tup => (tup._1, List(tup._2)))
                              .reduceByKey(_ ++ _)
     
@@ -84,9 +80,8 @@ object PageRank {
                  .reduceByKey((a, b) =>(math.abs(a._1 - b._1), List()), ctx.defaultParallelism * 3)
                  .map(tup => tup._2._1).sum()
       
-      iter += 1
       adjMat = matz.map(x => x)
-    } while(iter < 3)
+    } while(diff >= 0.001)
     
     adjMat.sortBy(tup => (-tup._2._1, tup._1), true, ctx.defaultParallelism * 3)
           .map(tup => tup._1 + "\t" + tup._2._1.toString())
