@@ -83,6 +83,8 @@ object PageRank {
         (math.abs(a._1 - b._1), List())
       }.map(tup => tup._2._1).sum()
       
+      matz.unpersist(false)
+      
     } while(diff >= 0.001)
     
     adjMat.sortBy(tup => (-tup._2._1, tup._1), true, ctx.defaultParallelism * 3)
