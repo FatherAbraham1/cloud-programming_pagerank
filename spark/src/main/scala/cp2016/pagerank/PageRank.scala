@@ -33,9 +33,6 @@ object PageRank {
 
     val pages = ctx.textFile(inputPath, ctx.defaultParallelism * 3)
 
-    val numDocs = pages.count()
-    val teleport = 0.15 * (1.0 / numDocs)
-    
     val linkPattern = """\[\[[^\]]+\]\]""".r
     val titlePattern = """<title>.+?</title>""".r
     val linkSplitPattern = "[#|]"
@@ -52,6 +49,9 @@ object PageRank {
       links.union(List((title, "")))
     }
 
+    val numDocs = pages.count()
+    val teleport = 0.15 * (1.0 / numDocs)
+    
     adjMatrix = adjMatrix.map(x => (x._2, x._1))
                          .leftOuterJoin(adjMatrix, ctx.defaultParallelism * 12)
                          .filter(x => x._1 == "" || !x._2._2.isEmpty)
