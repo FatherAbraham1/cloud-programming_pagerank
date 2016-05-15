@@ -31,7 +31,7 @@ object PageRank {
       }
     }
 
-    val pages = ctx.textFile(inputPath, ctx.defaultParallelism)
+    val pages = ctx.textFile(inputPath, ctx.defaultParallelism * 3)
 
     val numDocs = pages.count()
     val teleport = 0.15 * (1.0 / numDocs)
@@ -41,7 +41,8 @@ object PageRank {
     val linkSplitPattern = "[#|]"
     var adjMatrix = pages.flatMap { line =>
       var title = titlePattern.findFirstIn(line).get
-      title = unescape(title.substring(7, title.size - 8)).capitalize
+      var titleXml = XML.loadString(title) 
+      title = titleXml.text.capitalize
       var links = linkPattern.findAllIn(line)
                              .toList
                              .map { link => link.substring(2, link.length() - 2).split(linkSplitPattern) }
