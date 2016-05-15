@@ -54,7 +54,7 @@ object PageRank {
     var adjMat = tmpAdjMat.map(tup => (tup._1, (1.0 / n, tup._2)))
     
     var diff = 0.0
-    do {
+    //do {
       val matz = adjMat.cache()
 
       var sinkNodeRankSum = matz.filter(tup => tup._2._2.size == 1)
@@ -79,13 +79,13 @@ object PageRank {
         ((a._1 + b._1), a._2 ++ b._2)
       }.map(tup => (tup._1, (tup._2._1 + snkVal.value + teleport.value, tup._2._2)))
       
-      diff = matz.union(adjMat).reduceByKey { (a, b) =>
-        (math.abs(a._1 - b._1), List())
-      }.map(tup => tup._2._1).sum()
+      //diff = matz.union(adjMat).reduceByKey { (a, b) =>
+      //  (math.abs(a._1 - b._1), List())
+      //}.map(tup => tup._2._1).sum()
       
       matz.unpersist(false)
       
-    } while(diff >= 0.001)
+    //} while(diff >= 0.001)
     
     adjMat.sortBy(tup => (-tup._2._1, tup._1), true, ctx.defaultParallelism * 3)
           .map(tup => tup._1 + "\t" + tup._2._1.toString())
