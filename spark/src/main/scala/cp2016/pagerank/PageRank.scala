@@ -34,19 +34,17 @@ object PageRank {
     val pages = ctx.textFile(inputPath, ctx.defaultParallelism * 3)
 
     val linkPattern = """\[\[[^\]]+\]\]""".r
-    val titlePattern = """<title>.+?</title>""".r
     val linkSplitPattern = "[#|]"
     var adjMatrix = pages.flatMap { line =>
-      var title = titlePattern.findFirstIn(line).get
-      var titleXml = XML.loadString(title) 
-      title = titleXml.text.capitalize
+      val xmlElement = XML.loadString(line)
+      val title = (xmlElement \\ "title").text.capitalize
       var links = linkPattern.findAllIn(line)
-                             .toList
+                             .toArray
                              .map { link => link.substring(2, link.length() - 2).split(linkSplitPattern) }
                              .filter { arr => arr.size > 0 }
                              .map { arr => (title, unescape(arr(0)).capitalize) }
 
-      links.union(List((title, "")))
+      links.union(Array((title, "")))
     }
 
     val numDocs = pages.count()
