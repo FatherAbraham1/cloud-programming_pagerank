@@ -70,7 +70,9 @@ object PageRank {
                             val size = links.size
                             links.map(x => (x, rank / size))
                            }
-      ranks = updates.reduceByKey(_ + _).map(x => (x._1, teleport + 0.85 * x._2 + sinkNodeRankSum))
+      val newRanks = updates.reduceByKey(_ + _).map(x => (x._1, teleport + 0.85 * x._2 + sinkNodeRankSum))
+      
+      diff = ranks.join(newRanks).map(x => math.abs(x._2._1 - x._2._2)).sum()
       
       val end = System.nanoTime()
       println(end - begin)
