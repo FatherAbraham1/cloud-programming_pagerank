@@ -54,6 +54,7 @@ object PageRank {
     var adjMat = tmpAdjMat.map(tup => (tup._1, (1.0 / n, tup._2)))
     
     var diff = 0.0
+    var iter = 0
     do {
       val matz = adjMat.cache()
 
@@ -84,7 +85,8 @@ object PageRank {
       }.map(tup => tup._2._1).sum()
       
       matz.unpersist(false)
-      
+      ctx.parallelize(List((iter.toString() + " : " + diff.toString())), 1).saveAsTextFile("tmp/iter" + iter.toString())
+      iter += 1
     } while(diff == 0.0)
     
     adjMat.sortBy(tup => (-tup._2._1, tup._1), true, ctx.defaultParallelism * 3)
