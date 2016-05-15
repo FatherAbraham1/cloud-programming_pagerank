@@ -35,9 +35,13 @@ object PageRank {
         (title, link.substring(2, link.length() - 2).split(linkSplitPattern)(0).capitalize)
       }
     }
-    adjMatrix = adjMatrix.join(adjMatrix, ctx.defaultParallelism * 10)
-                         .filter(_._2._2 != null)
-                         .map (_._2)
+    
+    val keySet = adjMatrix.map(_._1)
+    val keys = ctx.broadcast(keySet.collect().toSet)
+    
+    adjMatrix = adjMatrix.filter {
+      case (_, link) => keys.value.contains(link)
+    }
     
     adjMatrix.saveAsTextFile(outputDir)
 
