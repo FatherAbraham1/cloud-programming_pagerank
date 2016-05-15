@@ -52,7 +52,7 @@ object PageRank {
     var tmpAdjMat = adjMatrix.map(tup => (tup._1, List(tup._2)))
                              .reduceByKey(_ ++ _)
     
-    var adjMat = tmpAdjMat.map(tup => (tup._1, (1.0 / n, tup._2))).sortByKey(true, ctx.defaultParallelism * 3)
+    var adjMat = tmpAdjMat.map(tup => (tup._1, (1.0 / n, tup._2)))
     
     var diff = 0.0
     do {
@@ -77,9 +77,12 @@ object PageRank {
         }
       }.reduceByKey{ (a, b) => 
         ((a._1 + b._1), a._2 ++ b._2)
-      }.sortByKey(true, ctx.defaultParallelism * 3)
+      }
       
-      diff = matz.zip(adjMat).map(tup => math.abs(tup._1._2._1 - tup._2._2._1)).sum()
+      diff = matz.union(adjMat).reduceByKey { (a, b) =>
+        (math.abs(a._1 - b._1), List())
+      }.map(tup => tup._2._1).sum()
+      
     } while(diff >= 0.001)
     
     adjMat.sortBy(tup => (-tup._2._1, tup._1), true, ctx.defaultParallelism * 3)
