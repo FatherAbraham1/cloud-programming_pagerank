@@ -16,23 +16,23 @@ public class App {
     public static void main( String[] args ) throws IllegalArgumentException, IOException, ClassNotFoundException, InterruptedException {
     	Configuration config = new Configuration();
     	config.set("mapreduce.output.textoutputformat.separator", "\t");
-    	
+
 		Job job = Job.getInstance(config, "XMLParser");
 		job.setJarByClass(App.class);
 
 		job.setMapperClass(RowMapper.class);
 		job.setReducerClass(RowReducer.class);
-		
+
 		job.setPartitionerClass(Spliter.class);
-		
+
 		job.setMapOutputKeyClass(IntWritable.class);
 		job.setMapOutputValueClass(TitleLinkPair.class);
-		
+
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
 
-		job.setNumReduceTasks(64);
-		
+		job.setNumReduceTasks(256);
+
 		TextInputFormat.addInputPath(job, new Path(args[0]));
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
 

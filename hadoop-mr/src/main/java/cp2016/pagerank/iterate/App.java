@@ -19,13 +19,13 @@ public class App {
     public static void main( String[] args ) throws IllegalArgumentException, IOException, ClassNotFoundException, InterruptedException {
     	Configuration config = new Configuration();
     	config.set("mapreduce.output.textoutputformat.separator", "\t");
-    	
+
     	FileSystem fs = FileSystem.get(config);
     	long count = fs.getContentSummary(new Path("tmp/titles")).getFileCount();
-    	
+
     	double stickness = 0.85;
     	config.setDouble("stickness", stickness);
-    	
+
     	double sinkNodeScore = 0.0;
     	{
     		Path sinkNodeFilePath = new Path("tmp/sinkNodeScore");
@@ -34,32 +34,32 @@ public class App {
     		BufferedReader br = new BufferedReader(reader);
     		String score = null;
     		score = br.readLine();
-    	
+
     		if (score != null) {
     			sinkNodeScore = Double.parseDouble(score) * stickness;
     		}
-    		
+
     		br.close();
         	reader.close();
         	inStream.close();
     	}
-    	
+
     	config.setDouble("constantFactor", (1.0 - stickness) / count + sinkNodeScore);
-    	
+
 		Job job = Job.getInstance(config, "PageRankIterator");
 		job.setJarByClass(App.class);
 
 		job.setMapperClass(RowMapper.class);
 		job.setReducerClass(RowReducer.class);
-		
+
 		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(ScoreLinkPair.class);
-		
+
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
 
-		job.setNumReduceTasks(64);
-		
+		job.setNumReduceTasks(256);
+
 		TextInputFormat.addInputPath(job, new Path(args[0]));
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
