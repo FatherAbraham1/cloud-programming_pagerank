@@ -40,8 +40,7 @@ object PageRank {
       links.union(List((title, "")))
     }
     
-    var n = 0
-    adjMatrix.map(_._1).distinct().foreach { _ => n += 1 }
+    val n = adjMatrix.map(_._1).distinct().map(_ => 1).sum()
     val numDocs = ctx.broadcast(n) 
     
     val invalidLinks = adjMatrix.fullOuterJoin(adjMatrix)
@@ -58,8 +57,9 @@ object PageRank {
     do {
       val matz = adjMat.cache()
 
-      var sinkNodeRankSum = 0.0
-      matz.filter(tup => tup._2._2.size == 1).foreach(tup => sinkNodeRankSum += tup._2._1)
+      var sinkNodeRankSum = matz.filter(tup => tup._2._2.size == 1)
+                                .map(tup => tup._2._1)
+                                .sum
       sinkNodeRankSum = sinkNodeRankSum / numDocs.value * 0.85
       val snkVal = ctx.broadcast(sinkNodeRankSum);
     
@@ -77,7 +77,7 @@ object PageRank {
         }
       }.reduceByKey{ (a, b) => 
         ((a._1 + b._1), a._2 ++ b._2)
-      }
+      }.map(tup => (tup._1, (tup._2._1 + snkVal.value + teleport.value, tup._2._2)))
       
       diff = matz.union(adjMat).reduceByKey { (a, b) =>
         (math.abs(a._1 - b._1), List())
