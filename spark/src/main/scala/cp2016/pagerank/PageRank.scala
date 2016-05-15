@@ -72,7 +72,7 @@ object PageRank {
           if (n.size == 0) {
             (tup._1, (0.0, neighbors))
           } else {
-            (n, (pr / (neighbors.size - 1) * 0.85, List()))
+            (n, (pr / (neighbors.size) * 0.85, List()))
           }
         }
       }.reduceByKey{ (a, b) => 
