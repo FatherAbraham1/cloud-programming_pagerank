@@ -80,7 +80,7 @@ object PageRank {
                  .map(tup => tup._2._1).sum()
       
       iter += 1
-      // adjMat = matz
+      adjMat = matz.map(x => x)
     } while(iter < 3)
     
     adjMat.sortBy(tup => (-tup._2._1, tup._1), true, ctx.defaultParallelism * 3)
