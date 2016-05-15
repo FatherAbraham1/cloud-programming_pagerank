@@ -5,5 +5,3 @@ BASEDIR=$(dirname "$0")
 hdfs dfs -rm -r -f $2
 
 spark-submit --class cp2016.pagerank.PageRank --num-executors 30 $BASEDIR/../target/spark.jar $1 $2
-
-hdfs dfs -cat $2/part-*
