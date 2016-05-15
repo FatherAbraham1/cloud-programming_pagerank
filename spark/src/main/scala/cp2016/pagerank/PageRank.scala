@@ -56,10 +56,11 @@ object PageRank {
     var iter = 0
     do {
       val begin = System.nanoTime()
-      var sinkNodeRankSum = adjMat.zip(ranks)
-                                  .filter(tup => tup._1._2.size == 1)
+      var sinkNodeRankSum = adjMat.join(ranks)
+                                  .filter(tup => tup._2._1.size == 1)
                                   .map(tup => tup._2._2)
                                   .sum()
+                                  
       sinkNodeRankSum = sinkNodeRankSum / numDocs * 0.85
     
       
