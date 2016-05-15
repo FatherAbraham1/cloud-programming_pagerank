@@ -40,16 +40,51 @@ object PageRank {
       links.union(List((title, "")))
     }
     
-    val keySet = adjMatrix.map(_._1).distinct()
-    val keys = ctx.broadcast(keySet)
+    var n = 0
+    adjMatrix.map(_._1).distinct().foreach { _ => n += 1 }
+    val numDocs = ctx.broadcast(n) 
     
     val invalidLinks = adjMatrix.fullOuterJoin(adjMatrix)
                                 .filter(x => x._2._2.isEmpty)
                                 .map(x => x._2._1.get).distinct().collect().toSet
     val bye = ctx.broadcast(invalidLinks)
     adjMatrix = adjMatrix.filter(x => !bye.value.contains(x._2))
+    var tmpAdjMat = adjMatrix.map(tup => (tup._1, List(tup._2)))
+                             .reduceByKey(_ ++ _)
     
-    adjMatrix.map(x => x._1).distinct().saveAsTextFile(outputDir)
+    var adjMat = tmpAdjMat.map(tup => (tup._1, (1.0 / n, tup._2))).sortByKey(true, ctx.defaultParallelism * 3)
+    
+    var diff = 0.0
+    do {
+      val matz = adjMat.cache()
+
+      var sinkNodeRankSum = 0.0
+      matz.filter(tup => tup._2._2.size == 1).foreach(tup => sinkNodeRankSum += tup._2._1)
+      sinkNodeRankSum = sinkNodeRankSum / numDocs.value * 0.85
+      val snkVal = ctx.broadcast(sinkNodeRankSum);
+    
+      val teleport = ctx.broadcast(0.15 * (1.0 / numDocs.value));
+    
+      adjMat = matz.flatMap { tup =>
+        val neighbors = tup._2._2
+        val pr = tup._2._1
+        neighbors.map { n =>
+          if (n.size == 0) {
+            (tup._1, (0.0, neighbors))
+          } else {
+            (n, (pr / (neighbors.size - 1) * 0.85, List()))
+          }
+        }
+      }.reduceByKey{ (a, b) => 
+        ((a._1 + b._1), a._2 ++ b._2)
+      }.sortByKey(true, ctx.defaultParallelism * 3)
+      
+      diff = matz.zip(adjMat).map(tup => math.abs(tup._1._2._1 - tup._2._2._1)).sum()
+    } while(diff >= 0.001)
+    
+    adjMat.sortBy(tup => (-tup._2._1, tup._1), true, ctx.defaultParallelism * 3)
+          .map(tup => tup._1 + "\t" + tup._2._1.toString())
+          .saveAsTextFile(outputDir)
 
     ctx.stop
   }
