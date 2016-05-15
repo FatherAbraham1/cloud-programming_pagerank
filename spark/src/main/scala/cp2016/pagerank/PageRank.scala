@@ -5,6 +5,14 @@ import org.apache.spark._
 import org.apache.hadoop.fs._
 
 object PageRank {
+  def unescape(str: String) : String = {
+    str.replaceAllLiterally("&lt;", "<")
+       .replaceAllLiterally("&gt;", ">")
+       .replaceAllLiterally("&amp;", "&")
+       .replaceAllLiterally("&quot;", "\"")
+       .replaceAllLiterally("&apos;", "'")
+  }
+  
   def main(args: Array[String]) {
     val inputPath = args(0)
     val outputDir = args(1)
@@ -25,22 +33,23 @@ object PageRank {
 
     val pages = ctx.textFile(inputPath, ctx.defaultParallelism)
 
+    val numDocs = pages.count()
+    val teleport = 0.15 * (1.0 / numDocs)
+    
     val linkPattern = """\[\[[^\]]+\]\]""".r
+    val titlePattern = """<title>.+?</title>""".r
     val linkSplitPattern = "[#|]"
     var adjMatrix = pages.flatMap { line =>
-      val xml = XML.loadString(line)
-      val title = (xml \\ "title").text.capitalize
+      var title = titlePattern.findFirstIn(line).get
+      title = unescape(title.substring(7, title.size - 8)).capitalize
       var links = linkPattern.findAllIn(line)
                              .toList
                              .map { link => link.substring(2, link.length() - 2).split(linkSplitPattern) }
                              .filter { arr => arr.size > 0 }
-                             .map { arr => (title, arr(0)) }
+                             .map { arr => (title, unescape(arr(0)).capitalize) }
 
       links.union(List((title, "")))
     }
-
-    val numDocs = adjMatrix.map(_._1).distinct().map(_ => 1).sum()
-    val teleport = 0.15 * (1.0 / numDocs)
 
     adjMatrix = adjMatrix.map(x => (x._2, x._1))
                          .leftOuterJoin(adjMatrix, ctx.defaultParallelism * 12)
