@@ -87,7 +87,7 @@ object PageRank {
       matz.unpersist(false)
       ctx.parallelize(List((iter.toString() + " : " + diff.toString())), 1).saveAsTextFile("tmp/iter" + iter.toString())
       iter += 1
-    } while(diff == 0.0)
+    } while(diff >= 0.001)
     
     adjMat.sortBy(tup => (-tup._2._1, tup._1), true, ctx.defaultParallelism * 3)
           .map(tup => tup._1 + "\t" + tup._2._1.toString())
