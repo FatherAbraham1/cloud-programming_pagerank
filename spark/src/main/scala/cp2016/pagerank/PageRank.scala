@@ -79,10 +79,9 @@ object PageRank {
                  .reduceByKey((a, b) =>(math.abs(a._1 - b._1), List()), ctx.defaultParallelism * 3)
                  .map(tup => tup._2._1).sum()
       
-      ctx.parallelize(List((iter.toString() + " : " + diff.toString())), 1).saveAsTextFile("tmp/iter" + iter.toString())
       iter += 1
-      adjMat = matz
-    } while(diff >= 0.001)
+      // adjMat = matz
+    } while(iter < 3)
     
     adjMat.sortBy(tup => (-tup._2._1, tup._1), true, ctx.defaultParallelism * 3)
           .map(tup => tup._1 + "\t" + tup._2._1.toString())
