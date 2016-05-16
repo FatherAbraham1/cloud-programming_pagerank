@@ -35,9 +35,8 @@ object PageRank {
 
     val linkPattern = """\[\[[^\]]+\]\]""".r
     val linkSplitPattern = "[#|]"
-    var numDocs = 0
+
     var adjMatrix = pages.flatMap { line =>
-      numDocs += 1
       val xmlElement = XML.loadString(line)
       val title = (xmlElement \\ "title").text.capitalize
       var links = linkPattern.findAllIn(line)
@@ -71,9 +70,8 @@ object PageRank {
         (tup._1, tup._2.filter(x => !x.isEmpty()))
       }
     }
-    
+    val numDocs = adjMatrix.count()
     val teleport = 0.15 * (1.0 / numDocs)
-    println(numDocs)
     val adjMat = adjMatrix.cache()
     var ranks = adjMat.map(x => (x._1, 1.0 / numDocs))
 
