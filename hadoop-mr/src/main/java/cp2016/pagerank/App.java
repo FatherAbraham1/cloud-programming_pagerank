@@ -123,7 +123,8 @@ public class App {
 		job.setNumReduceTasks(1);
 		
 		TextInputFormat.addInputPath(job, new Path(inputPath));
-
+		FileOutputFormat.setOutputPath(job, new Path(outputPath + Long.toString(System.currentTimeMillis())));
+		
 		job.waitForCompletion(true);
 		
 		double sinkNodeScore = 0.0;
@@ -194,6 +195,7 @@ public class App {
 		job.setNumReduceTasks(64);
 
 		TextInputFormat.addInputPath(job, new Path(inputPath));
+		FileOutputFormat.setOutputPath(job, new Path(inputPath + "@" + Long.toString(System.currentTimeMillis())));
 
 		job.waitForCompletion(true);
 		
