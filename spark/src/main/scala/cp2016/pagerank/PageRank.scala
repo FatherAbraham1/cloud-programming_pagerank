@@ -46,9 +46,7 @@ object PageRank {
                              .map { arr => (unescape(arr(0)).capitalize, title) }
 
       links.union(Array((title, "🐦" + title + "🐦")))
-    }.groupByKey()
-    
-    adjMatrix = adjMatrix.filter { tup => 
+    }.groupByKey.filter { tup => 
       val magicWord = "🐦" + tup._1 + "🐦"
       val titles = tup._2.toSet
       titles.contains(magicWord)
