@@ -21,7 +21,7 @@ public class App {
     	config.set("mapreduce.output.textoutputformat.separator", "\t");
 
     	FileSystem fs = FileSystem.get(config);
-    	long count = fs.getContentSummary(new Path("tmp/titles")).getFileCount();
+    	long count = Long.parseLong(args[2]);
 
     	double stickness = 0.85;
     	config.setDouble("stickness", stickness);

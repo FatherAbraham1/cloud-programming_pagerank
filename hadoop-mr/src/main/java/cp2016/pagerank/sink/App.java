@@ -3,7 +3,6 @@ package cp2016.pagerank.sink;
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IntWritable;
@@ -17,9 +16,7 @@ public class App {
 		Configuration config = new Configuration();
     	config.set("mapreduce.output.textoutputformat.separator", "");
     	
-    	FileSystem fs = FileSystem.get(config);
-    	long count = fs.getContentSummary(new Path("tmp/titles")).getFileCount();
-    	config.setLong("numberOfTitles", count);
+    	config.setLong("numberOfTitles", Long.parseLong(args[2]));
     	
 		Job job = Job.getInstance(config, "SinkNodeScoreAggregator");
 		job.setJarByClass(App.class);

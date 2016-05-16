@@ -7,16 +7,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-import com.alibaba.fastjson.JSON;
+import cp2016.pagerank.common.MapCounter;
 
-import cp2016.pagerank.common.TitleLinkPair;
-
-public class RowMapper extends Mapper<LongWritable, Text, IntWritable, TitleLinkPair> {
+public class RowMapper extends Mapper<LongWritable, Text, Text, Text> {
 
 	private final Pattern titlePattern = Pattern.compile("<title>.+</title>");
 	private final Pattern linkPattern = Pattern.compile("\\[\\[[^\\]]+\\]\\]");
@@ -44,13 +41,18 @@ public class RowMapper extends Mapper<LongWritable, Text, IntWritable, TitleLink
 				if (title == null) {
 					continue;
 				}
-
+				
+				context.getCounter(MapCounter.InputRecords).increment(1);
+				
 				List<String> links = new ArrayList<>();
 				if (text != null) {
 					links = parseLinks(text);
 				}
-
-				context.write(new IntWritable(0), new TitleLinkPair(title, JSON.toJSONString(links)));
+				
+				for (String link : links) {
+					context.write(new Text(link), new Text(title));
+				}
+				context.write(new Text(title), new Text(title));
 			}
 		}
 	}

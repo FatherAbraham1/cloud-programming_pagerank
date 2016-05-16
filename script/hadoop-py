@@ -1,5 +1,6 @@
 import subprocess as sp
 import os.path
+import sys
 
 def parse_result(raw_str):
     result = {}
@@ -9,10 +10,10 @@ def parse_result(raw_str):
             result[vals[0]] = float(vals[1])
     return result
 
-def main():
+def main(argv):
     containing_dir = os.path.abspath(os.path.join(__file__, os.pardir))
     hdfs_dirs = ['one', 'two']
-    sp.check_output([containing_dir + '/iterate-hadoop', hdfs_dirs[0], hdfs_dirs[1]])
+    sp.check_output([containing_dir + '/iterate-hadoop', hdfs_dirs[0], hdfs_dirs[1], argv[1]])
 
     log_file = open('./diff.log', 'w+')
 
@@ -27,7 +28,7 @@ def main():
             diff += abs(old_val - new_val)
 
         log_file.write(str(diff) + '\n')
-        
+
         if diff < 0.001:
             sp.check_output(['hdfs', 'dfs', '-cp', 'tmp/' + hdfs_dirs[1], 'tmp/stable'])
             break
