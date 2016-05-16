@@ -30,18 +30,26 @@ public class App {
 		String outputPath = args[1];
 		long iter = 0;
 		String tmpGraphPath = outputPath + "-tmp-graph-";
+		
+		long parsingStart = System.currentTimeMillis();
+		System.out.println("Start parsing...");
 		long recordCount = parse(inputPath, outputPath + "-inverted-graph");
 		filter(outputPath + "-inverted-graph", tmpGraphPath + Long.toString(iter), recordCount);
+		long parsingEnd = System.currentTimeMillis();
+		System.out.println("Done parsing: " + Double.toString((parsingEnd - parsingStart) / 1000.0));
 		
 		String sinkNodeFile = outputPath + "-sinkNodeFile";
 		boolean converges = false;
 		do {
+			System.out.println("iteration #" + Long.toString(iter) + " started");
+			long iterStart = System.currentTimeMillis();
 			double sinkNodeScore = sinkNodeScore(tmpGraphPath + Long.toString(iter), sinkNodeFile, recordCount);
 			String newPath = tmpGraphPath + Long.toString(iter + 1);
 			iterate(tmpGraphPath + Long.toString(iter), newPath, recordCount, sinkNodeScore);
 			converges = diff(newPath);
+			long iterEnd = System.currentTimeMillis();
+			System.out.println("iteration #" + Long.toString(iter) + " ended: " + Double.toString((iterEnd - iterStart) / 1000.0));
 			iter += 1;
-			converges = true;
 		} while(!converges);
 		
 		System.exit(result(tmpGraphPath + Long.toString(iter), outputPath));
