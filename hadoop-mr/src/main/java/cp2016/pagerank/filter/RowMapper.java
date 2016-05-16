@@ -19,16 +19,15 @@ public class RowMapper extends Mapper<LongWritable, Text, Text, Text> {
 			String[] kv = r.split("\t");
 			String link = kv[0];
 			String titlesJSON = kv[1];
+			String magicWord = "😄" + link;
 			
 			List<String> titles = JSON.parseArray(titlesJSON, String.class);
-			if (titles.contains(link)) {
-				if (titles.size() == 1) {
-					context.write(new Text(titles.get(0)), new Text(""));
-				} else {
-					for (String title : titles) {
-						if(!link.equals(link)) {
-							context.write(new Text(title), new Text(link));
-						}
+			if (titles.contains(magicWord)) {
+				for (String title : titles) {
+					if(!title.equals(magicWord)) {
+						context.write(new Text(title), new Text(link));
+					} else {
+						context.write(new Text(title), new Text(""));
 					}
 				}
 			}

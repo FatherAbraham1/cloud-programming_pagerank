@@ -52,7 +52,7 @@ public class RowMapper extends Mapper<LongWritable, Text, Text, Text> {
 				for (String link : links) {
 					context.write(new Text(link), new Text(title));
 				}
-				context.write(new Text(title), new Text(title));
+				context.write(new Text(title), new Text("😄" + title));
 			}
 		}
 	}
