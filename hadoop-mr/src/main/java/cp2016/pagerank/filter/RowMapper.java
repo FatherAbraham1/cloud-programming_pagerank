@@ -23,11 +23,10 @@ public class RowMapper extends Mapper<LongWritable, Text, Text, Text> {
 			
 			List<String> titles = JSON.parseArray(titlesJSON, String.class);
 			if (titles.contains(magicWord)) {
+				context.write(new Text(link), new Text(""));
 				for (String title : titles) {
 					if(!title.equals(magicWord)) {
 						context.write(new Text(title), new Text(link));
-					} else {
-						context.write(new Text(title), new Text(""));
 					}
 				}
 			}
