@@ -62,7 +62,7 @@ object PageRank {
     }.groupByKey()
 
     adjMatrix.saveAsTextFile("not-a-file")
-    
+    return
     val teleport = 0.15 * (1.0 / numDocs)
    
     val adjMat = adjMatrix.cache()
