@@ -22,9 +22,13 @@ public class RowMapper extends Mapper<LongWritable, Text, Text, Text> {
 			
 			List<String> links = JSON.parseArray(linksJSON, String.class);
 			if (links.contains(title)) {
-				for (String link : links) {
-					if(!link.equals(title)) {
-						context.write(new Text(link), new Text(title));
+				if (links.size() == 1) {
+					context.write(new Text(links.get(0)), new Text(""));
+				} else {
+					for (String link : links) {
+						if(!link.equals(title)) {
+							context.write(new Text(link), new Text(title));
+						}
 					}
 				}
 			}

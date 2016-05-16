@@ -26,7 +26,10 @@ public class RowReducer extends Reducer<Text, Text, TitleRankPair, Text> {
 		
 		List<String> links = new ArrayList<>();
 		for (Text val : values) {
-			links.add(val.toString());
+			String valString = val.toString();
+			if (!valString.isEmpty()){
+				links.add(val.toString());
+			}
 		}
 		
 		context.write(new TitleRankPair(key.toString(), 1.0 / numberOfTitles),  new Text(JSON.toJSONString(links)));
