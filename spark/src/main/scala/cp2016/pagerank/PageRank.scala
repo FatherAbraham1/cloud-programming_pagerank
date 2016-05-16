@@ -38,7 +38,7 @@ object PageRank {
     
     val parseStartTime = System.nanoTime()
     println("Start parsing")
-    var adjMatrix = pages.flatMap { line =>
+    val adjMat = pages.flatMap { line =>
       val xmlElement = XML.loadString(line)
       val title = (xmlElement \\ "title").text.capitalize
       var links = linkPattern.findAllIn(line)
@@ -48,12 +48,7 @@ object PageRank {
                              .map { arr => (unescape(arr(0)).capitalize, title) }
 
       links.union(Array((title, "🐦" + title + "🐦")))
-    }.groupByKey(ctx.defaultParallelism * 3)
-    
-    val st1 = System.nanoTime()
-    println("First group by" + ((st1 - parseStartTime)/1000000000.0).toString())
-    
-    adjMatrix = adjMatrix.filter { tup => 
+    }.groupByKey(ctx.defaultParallelism * 3).filter { tup => 
       val magicWord = "🐦" + tup._1 + "🐦"
       val titles = tup._2.toSet
       titles.contains(magicWord)
@@ -68,36 +63,25 @@ object PageRank {
            (link, "")
          }
        }
-    }.groupByKey(ctx.defaultParallelism * 3)
-    
-    val st2 = System.nanoTime()
-    println("Second group by" + ((st2 - st1)/1000000000.0).toString())
-    
-    adjMatrix = adjMatrix.map { tup =>
+    }.groupByKey(ctx.defaultParallelism * 3).map { tup =>
       if(tup._2.size == 1){
         (tup._1, Iterable())
       } else {
         (tup._1, tup._2.filter(x => !x.isEmpty()))
       }
-    }
+    }.cache
     
     val finalT = System.nanoTime()
     println("Parsing time " + ((finalT - parseStartTime)/1000000000.0).toString())
     
     val cnt_s = System.nanoTime()
     
-    val numDocs = adjMatrix.count()
+    val numDocs = adjMat.count()
     val cnt_e = System.nanoTime()
     
     println("count time " + ((cnt_e - cnt_s)/1000000000.0).toString())
     
     val teleport = 0.15 * (1.0 / numDocs)
-    
-    val cache_s = System.nanoTime()
-    val adjMat = adjMatrix.cache()
-    val cache_e = System.nanoTime()
-    
-    println("cache time " + ((cache_e - cache_s)/1000000000.0).toString())
     
     val rank_s = System.nanoTime()
     var ranks = adjMat.map(x => (x._1, 1.0 / numDocs))
