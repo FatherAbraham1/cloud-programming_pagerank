@@ -5,14 +5,6 @@ import org.apache.spark._
 import org.apache.hadoop.fs._
 
 object PageRank {
-  def unescape(str: String) : String = {
-    str.replaceAllLiterally("&lt;", "<")
-       .replaceAllLiterally("&gt;", ">")
-       .replaceAllLiterally("&amp;", "&")
-       .replaceAllLiterally("&quot;", "\"")
-       .replaceAllLiterally("&apos;", "'")
-  }
-  
   def main(args: Array[String]) {
     val inputPath = args(0)
     val outputDir = args(1)
@@ -73,32 +65,23 @@ object PageRank {
     
     val finalT = System.nanoTime()
     println("Parsing time " + ((finalT - parseStartTime)/1000000000.0).toString())
-    println("Start counting")
-    val cnt_s = System.nanoTime()
     
-    val numDocs = pages.count()
-    val cnt_e = System.nanoTime()
-    
-    println("count time " + ((cnt_e - cnt_s)/1000000000.0).toString())
-    
-    val teleport = 0.15 * (1.0 / numDocs)
+    val teleport = 0.15
     
     val rank_s = System.nanoTime()
-    var ranks = adjMat.map(x => (x._1, 1.0 / numDocs))
+    var ranks = adjMat.map(x => (x._1, 1.0))
     val rank_e = System.nanoTime()
     println("rank map time " + ((rank_e - rank_s)/1000000000.0).toString())
+    
+    val sinkNodes = adjMat.filter(tup => tup._2.size == 0).cache()
     
     var diff = 0.0
     var iter = 0
     do {
       val begin = System.nanoTime()
-      var sinkNodeRankSum = adjMat.join(ranks)
-                                  .filter(tup => tup._2._1.size == 0)
-                                  .map(tup => tup._2._2)
-                                  .sum()
-
-      sinkNodeRankSum = sinkNodeRankSum / numDocs * 0.85
-
+      val sinkNodeRankSum = sinkNodes.join(ranks)
+                                     .map(tup => tup._2._2)
+                                     .sum() * 0.85
 
       val updates = adjMat.join(ranks)
                           .values
@@ -117,8 +100,9 @@ object PageRank {
       println(s"round: " + (end - begin)/1000000000.0)
     } while(diff >= 0.001)
 
+    val numDocs = ranks.count() 
     ranks.sortBy(tup => (-tup._2, tup._1), true, ctx.defaultParallelism * 9)
-          .map(tup => tup._1 + "\t" + tup._2.toString())
+          .map(tup => tup._1 + "\t" + (tup._2 / numDocs).toString())
           .saveAsTextFile(outputDir)
 
     try { ctx.stop } catch { case _ : Throwable => {} }
