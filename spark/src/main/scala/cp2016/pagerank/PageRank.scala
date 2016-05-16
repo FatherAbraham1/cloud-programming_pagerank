@@ -73,10 +73,10 @@ object PageRank {
     
     val finalT = System.nanoTime()
     println("Parsing time " + ((finalT - parseStartTime)/1000000000.0).toString())
-    
+    println("Start counting")
     val cnt_s = System.nanoTime()
     
-    val numDocs = adjMat.count()
+    val numDocs = adjMat.map(_ => 1).sum
     val cnt_e = System.nanoTime()
     
     println("count time " + ((cnt_e - cnt_s)/1000000000.0).toString())
