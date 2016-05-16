@@ -76,7 +76,7 @@ object PageRank {
     println("Start counting")
     val cnt_s = System.nanoTime()
     
-    val numDocs = adjMat.map(_ => 1).sum
+    val numDocs = pages.count()
     val cnt_e = System.nanoTime()
     
     println("count time " + ((cnt_e - cnt_s)/1000000000.0).toString())
