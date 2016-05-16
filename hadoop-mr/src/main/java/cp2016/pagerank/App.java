@@ -36,7 +36,7 @@ public class App {
 		String sinkNodeFile = outputPath + "-sinkNodeFile";
 		boolean converges = false;
 		do {
-			double sinkNodeScore = sinkNodeScore(tmpGraphPath, sinkNodeFile, recordCount);
+			double sinkNodeScore = sinkNodeScore(tmpGraphPath + Long.toString(iter), sinkNodeFile, recordCount);
 			String newPath = tmpGraphPath + Long.toString(iter + 1);
 			iterate(tmpGraphPath + Long.toString(iter), newPath, recordCount, sinkNodeScore);
 			converges = diff(newPath);
