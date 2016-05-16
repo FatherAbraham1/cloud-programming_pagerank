@@ -30,7 +30,7 @@ public class App {
 		job.setOutputKeyClass(TitleRankPair.class);
 		job.setOutputValueClass(Text.class);
 
-		job.setNumReduceTasks(0);
+		job.setNumReduceTasks(64);
 		
 		FileInputFormat.addInputPath(job, new Path(args[0]));
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
