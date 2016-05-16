@@ -9,7 +9,7 @@ hdfs dfs -mkdir -p tmp
 hdfs dfs -mkdir -p tmp/titles
 
 NUMDOCS=$(hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.parse.App $1 tmp/init)
-echo $NUMDOCS
+
 hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.filter.App tmp/init tmp/one $NUMDOCS
 
 $BASEDIR/hadoop-sink-score one $NUMDOCS

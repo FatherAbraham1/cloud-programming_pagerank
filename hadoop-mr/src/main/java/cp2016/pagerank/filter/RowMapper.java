@@ -17,17 +17,17 @@ public class RowMapper extends Mapper<LongWritable, Text, Text, Text> {
 		String[] records = value.toString().split("\n");
 		for (String r : records) {
 			String[] kv = r.split("\t");
-			String title = kv[0];
-			String linksJSON = kv[1];
+			String link = kv[0];
+			String titlesJSON = kv[1];
 			
-			List<String> links = JSON.parseArray(linksJSON, String.class);
-			if (links.contains(title)) {
-				if (links.size() == 1) {
-					context.write(new Text(links.get(0)), new Text(""));
+			List<String> titles = JSON.parseArray(titlesJSON, String.class);
+			if (titles.contains(link)) {
+				if (titles.size() == 1) {
+					context.write(new Text(titles.get(0)), new Text(""));
 				} else {
-					for (String link : links) {
-						if(!link.equals(title)) {
-							context.write(new Text(link), new Text(title));
+					for (String title : titles) {
+						if(!link.equals(link)) {
+							context.write(new Text(title), new Text(link));
 						}
 					}
 				}
