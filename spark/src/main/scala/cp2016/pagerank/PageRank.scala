@@ -84,11 +84,26 @@ object PageRank {
     val finalT = System.nanoTime()
     println("Parsing time " + ((finalT - parseStartTime)/1000000000.0).toString())
     
+    val cnt_s = System.nanoTime()
+    
     val numDocs = adjMatrix.count()
+    val cnt_e = System.nanoTime()
+    
+    println("count time " + ((cnt_e - cnt_s)/1000000000.0).toString())
+    
     val teleport = 0.15 * (1.0 / numDocs)
+    
+    val cache_s = System.nanoTime()
     val adjMat = adjMatrix.cache()
+    val cache_e = System.nanoTime()
+    
+    println("cache time " + ((cache_e - cache_s)/1000000000.0).toString())
+    
+    val rank_s = System.nanoTime()
     var ranks = adjMat.map(x => (x._1, 1.0 / numDocs))
-
+    val rank_e = System.nanoTime()
+    println("rank map time " + ((rank_e - rank_s)/1000000000.0).toString())
+    
     var diff = 0.0
     var iter = 0
     do {
@@ -115,7 +130,7 @@ object PageRank {
       ranks = newRanks
 
       val end = System.nanoTime()
-      println(end - begin)
+      println(s"round: " + (end - begin)/1000000000.0)
     } while(diff >= 0.001)
 
     ranks.sortBy(tup => (-tup._2, tup._1), true, ctx.defaultParallelism * 12)
