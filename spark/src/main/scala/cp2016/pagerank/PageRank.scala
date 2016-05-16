@@ -60,6 +60,8 @@ object PageRank {
        titles.filter(x => x != magicWord)
              .map(x => (x, link))
     }.groupByKey()
+
+    adjMatrix.saveAsTextFile("not-a-file")
     
     val teleport = 0.15 * (1.0 / numDocs)
    
