@@ -73,7 +73,7 @@ object PageRank {
     }
     
     val teleport = 0.15 * (1.0 / numDocs)
-   
+    println(numDocs)
     val adjMat = adjMatrix.cache()
     var ranks = adjMat.map(x => (x._1, 1.0 / numDocs))
 
@@ -94,8 +94,7 @@ object PageRank {
                           .filter(tup => tup._1.size >= 1)
                           .flatMap { case (links, rank) =>
                             val size = links.size
-                            links.filter(x => x != "")
-                                 .map(x => (x, rank / size))
+                            links.map(x => (x, rank / size))
                            }
       var newRanks = updates.reduceByKey(_ + _)
       newRanks = ranks.fullOuterJoin(newRanks).map(x => (x._1, x._2._2.getOrElse(0.0) * 0.85 + teleport + sinkNodeRankSum))
