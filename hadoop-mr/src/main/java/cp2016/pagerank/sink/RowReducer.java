@@ -35,5 +35,7 @@ public class RowReducer extends Reducer<IntWritable, DoubleWritable, Text, Text>
         
         bw.close();
 		writer.close();
+		
+		context.getConfiguration().setDouble("sinkNodeValue", score / numTitles);
 	}
 }

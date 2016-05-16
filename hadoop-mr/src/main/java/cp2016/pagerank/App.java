@@ -153,6 +153,9 @@ public class App {
         	reader.close();
         	inStream.close();
     	}
+    	
+    	System.out.println(config.getDouble("sinkNodeValue", 0.0));
+    	
     	return sinkNodeScore;
 	}
 	
@@ -206,8 +209,8 @@ public class App {
 		FileOutputFormat.setOutputPath(job, new Path(inputPath + "@" + Long.toString(System.currentTimeMillis())));
 
 		job.waitForCompletion(true);
-		
-		return job.getCounters().findCounter(ReduceCounter.CONVERGENCE).getValue() > 0 ? true : false;
+		System.out.println(config.getDouble("diff", 0.0));
+		return true;
 	}
 	
 	private static int result(String inputPath, String outputPath) throws IOException, ClassNotFoundException, InterruptedException {

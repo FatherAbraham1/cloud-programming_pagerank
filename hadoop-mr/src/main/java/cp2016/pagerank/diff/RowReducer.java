@@ -18,8 +18,6 @@ public class RowReducer extends Reducer<IntWritable, DoubleWritable, IntWritable
 			diff += val.get();
 		}
 		
-		
-		context.getCounter(ReduceCounter.CONVERGENCE).increment(diff >= 0.001 ? 0 : 1);
-		
+		context.getConfiguration().setDouble("diff", diff);
 	}
 }
