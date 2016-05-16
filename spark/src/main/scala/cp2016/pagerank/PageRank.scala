@@ -46,7 +46,7 @@ object PageRank {
                              .map { arr => (unescape(arr(0)).capitalize, title) }
 
       links.union(Array((title, "🐦" + title + "🐦")))
-    }.groupByKey.filter { tup => 
+    }.groupByKey(ctx.defaultParallelism * 3).filter { tup => 
       val magicWord = "🐦" + tup._1 + "🐦"
       val titles = tup._2.toSet
       titles.contains(magicWord)
@@ -61,7 +61,7 @@ object PageRank {
            (link, "")
          }
        }
-    }.groupByKey.map { tup =>
+    }.groupByKey(ctx.defaultParallelism * 3).map { tup =>
       if(tup._2.size == 1){
         (tup._1, Iterable())
       } else {
