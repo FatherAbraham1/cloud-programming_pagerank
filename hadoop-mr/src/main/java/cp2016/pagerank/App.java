@@ -45,6 +45,7 @@ public class App {
 			System.out.println("iteration #" + Long.toString(iter) + " started");
 			long iterStart = System.currentTimeMillis();
 			double sinkNodeScore = sinkNodeScore(tmpGraphPath + Long.toString(iter), sinkNodeFile, recordCount);
+			System.out.println("Sink node score: " + Double.toString(sinkNodeScore));
 			String newPath = tmpGraphPath + Long.toString(iter + 1);
 			iterate(tmpGraphPath + Long.toString(iter), newPath, recordCount, sinkNodeScore);
 			double diff = diff(newPath, diffFile);
@@ -156,9 +157,7 @@ public class App {
         	reader.close();
         	inStream.close();
     	}
-    	
-    	System.out.println(config.getDouble("sinkNodeValue", 0.0));
-    	
+
     	return sinkNodeScore;
 	}
 	
