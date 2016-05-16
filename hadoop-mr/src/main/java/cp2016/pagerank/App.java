@@ -81,7 +81,8 @@ public class App {
     	config.setLong("numberOfTitles", numDocs);
     	
 		Job job = Job.getInstance(config, "LinkFilter");
-
+		job.setJarByClass(App.class);
+		
 		job.setMapperClass(cp2016.pagerank.filter.RowMapper.class);
 		job.setReducerClass(cp2016.pagerank.filter.RowReducer.class);
 		
