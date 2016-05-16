@@ -54,12 +54,12 @@ object PageRank {
       val titles = tup._2.toSet
       titles.contains(magicWord)
     }.flatMap { tup =>
-      val link = tup._1
+       val link = tup._1
        val magicWord = "🐦" + link + "🐦"
        val titles = tup._2.toSet
        titles.map { x =>
          if (x != magicWord) {
-           (link, x)
+           (x, link)
          } else {
            (link, "")
          }
