@@ -59,9 +59,9 @@ object PageRank {
        val titles = tup._2.toSet
        titles.map { x =>
          if (x != magicWord) {
-           (x, link)
+           (link, x)
          } else {
-           (x, "")
+           (link, "")
          }
        }
     }.groupByKey.map { tup =>
@@ -69,6 +69,14 @@ object PageRank {
         (tup._1, Iterable())
       } else {
         tup
+      }
+    }
+    
+    try {
+      hdfs.delete(new Path("not-a-file"), true)
+    } catch {
+      case ex : Throwable => {
+        println(ex.getMessage)
       }
     }
 
