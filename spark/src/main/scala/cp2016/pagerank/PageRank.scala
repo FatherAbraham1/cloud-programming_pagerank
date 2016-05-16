@@ -68,20 +68,10 @@ object PageRank {
       if(tup._2.size == 1){
         (tup._1, Iterable())
       } else {
-        tup
+        (tup._1, tup._2.filter(x => !x.isEmpty()))
       }
     }
     
-    try {
-      hdfs.delete(new Path("not-a-file"), true)
-    } catch {
-      case ex : Throwable => {
-        println(ex.getMessage)
-      }
-    }
-
-    adjMatrix.saveAsTextFile("not-a-file")
-    return
     val teleport = 0.15 * (1.0 / numDocs)
    
     val adjMat = adjMatrix.cache()
