@@ -18,12 +18,12 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import cp2016.pagerank.common.MapCounter;
 import cp2016.pagerank.common.RanksLinkPair;
-import cp2016.pagerank.common.ReduceCounter;
 import cp2016.pagerank.common.TitleRanksPair;
 
 public class App {
 	
 	private static final double STICKNESS_FACTOR = 0.85;
+	private static final double CONVERGENCE_CRITERIA = 0.001;
 	
 	public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
 		String inputPath = args[0];
@@ -39,6 +39,7 @@ public class App {
 		System.out.println("Done parsing: " + Double.toString((parsingEnd - parsingStart) / 1000.0));
 		
 		String sinkNodeFile = outputPath + "-sinkNodeFile";
+		String diffFile = outputPath + "-diffFile";
 		boolean converges = false;
 		do {
 			System.out.println("iteration #" + Long.toString(iter) + " started");
@@ -46,8 +47,10 @@ public class App {
 			double sinkNodeScore = sinkNodeScore(tmpGraphPath + Long.toString(iter), sinkNodeFile, recordCount);
 			String newPath = tmpGraphPath + Long.toString(iter + 1);
 			iterate(tmpGraphPath + Long.toString(iter), newPath, recordCount, sinkNodeScore);
-			converges = diff(newPath);
+			double diff = diff(newPath, diffFile);
+			converges = diff < CONVERGENCE_CRITERIA;
 			long iterEnd = System.currentTimeMillis();
+			System.out.println("Score updates: " + Double.toString(diff));
 			System.out.println("iteration #" + Long.toString(iter) + " ended: " + Double.toString((iterEnd - iterStart) / 1000.0));
 			iter += 1;
 		} while(!converges);
@@ -138,7 +141,7 @@ public class App {
 		double sinkNodeScore = 0.0;
     	{
     		FileSystem fs = FileSystem.get(config);
-    		Path sinkNodeFilePath = new Path("tmp/sinkNodeScore");
+    		Path sinkNodeFilePath = new Path(outputPath);
     		FSDataInputStream inStream = fs.open(sinkNodeFilePath);
     		InputStreamReader reader = new InputStreamReader(inStream);
     		BufferedReader br = new BufferedReader(reader);
@@ -187,10 +190,11 @@ public class App {
 		job.waitForCompletion(true);
 	}
 	
-	private static boolean diff(String inputPath) throws IllegalArgumentException, IOException, ClassNotFoundException, InterruptedException {
+	private static double diff(String inputPath, String outputPath) throws IllegalArgumentException, IOException, ClassNotFoundException, InterruptedException {
 		Configuration config = new Configuration();
     	config.set("mapreduce.output.textoutputformat.separator", "\t");
-
+    	config.set("diffOutputFile", outputPath);
+    	
 		Job job = Job.getInstance(config, "PageDiffCalculator");
 		job.setJarByClass(App.class);
 
@@ -209,8 +213,29 @@ public class App {
 		FileOutputFormat.setOutputPath(job, new Path(inputPath + "@" + Long.toString(System.currentTimeMillis())));
 
 		job.waitForCompletion(true);
-		System.out.println(config.getDouble("diff", 0.0));
-		return true;
+		
+		
+		double diff = 0.0;
+    	{
+    		FileSystem fs = FileSystem.get(config);
+    		Path diffFilePath = new Path(outputPath);
+    		FSDataInputStream inStream = fs.open(diffFilePath);
+    		InputStreamReader reader = new InputStreamReader(inStream);
+    		BufferedReader br = new BufferedReader(reader);
+    		String score = null;
+    		score = br.readLine();
+
+    		if (score != null) {
+    			diff = Double.parseDouble(score);
+    		}
+
+    		br.close();
+        	reader.close();
+        	inStream.close();
+    	}
+		
+		
+		return diff;
 	}
 	
 	private static int result(String inputPath, String outputPath) throws IOException, ClassNotFoundException, InterruptedException {

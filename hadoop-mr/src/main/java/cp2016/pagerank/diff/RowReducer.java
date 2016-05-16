@@ -1,12 +1,14 @@
 package cp2016.pagerank.diff;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Reducer;
-
-import cp2016.pagerank.common.ReduceCounter;
 
 public class RowReducer extends Reducer<IntWritable, DoubleWritable, IntWritable, IntWritable> {
 	@Override
@@ -18,6 +20,13 @@ public class RowReducer extends Reducer<IntWritable, DoubleWritable, IntWritable
 			diff += val.get();
 		}
 		
-		context.getConfiguration().setDouble("diff", diff);
+		FileSystem fs = FileSystem.get(context.getConfiguration());
+		Path path = new Path(context.getConfiguration().get("diffOutputFile"));
+		OutputStreamWriter writer = new OutputStreamWriter(fs.create(path, true));
+		BufferedWriter bw = new BufferedWriter(writer);
+        bw.write(Double.toString(diff) + "\n");
+        
+        bw.close();
+		writer.close();
 	}
 }
