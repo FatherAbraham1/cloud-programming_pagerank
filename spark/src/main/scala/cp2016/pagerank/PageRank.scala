@@ -35,28 +35,35 @@ object PageRank {
 
     val linkPattern = """\[\[[^\]]+\]\]""".r
     val linkSplitPattern = "[#|]"
+    var numDocs = 0
     var adjMatrix = pages.flatMap { line =>
+      numDocs += 1
       val xmlElement = XML.loadString(line)
       val title = (xmlElement \\ "title").text.capitalize
       var links = linkPattern.findAllIn(line)
                              .toArray
                              .map { link => link.substring(2, link.length() - 2).split(linkSplitPattern) }
                              .filter { arr => arr.size > 0 }
-                             .map { arr => (title, unescape(arr(0)).capitalize) }
+                             .map { arr => (unescape(arr(0)).capitalize, title) }
 
-      links.union(Array((title, "")))
-    }
-
-    val numDocs = pages.count()
-    val teleport = 0.15 * (1.0 / numDocs)
+      links.union(Array((title, "🐦" + title + "🐦")))
+    }.groupByKey()
     
-    adjMatrix = adjMatrix.map(x => (x._2, x._1))
-                         .leftOuterJoin(adjMatrix, ctx.defaultParallelism * 12)
-                         .filter(x => x._1 == "" || !x._2._2.isEmpty)
-                         .filter(x => !x._2._2.exists(e => e == ""))
-                         .map(x => (x._2._1, x._1))
-
-    val adjMat = adjMatrix.groupByKey().cache()
+    adjMatrix = adjMatrix.filter { tup => 
+      val magicWord = "🐦" + tup._1 + "🐦"
+      val titles = tup._2.toSet
+      titles.contains(magicWord)
+    }.flatMap { tup =>
+      val link = tup._1
+       val magicWord = "🐦" + link + "🐦"
+       val titles = tup._2.toSet
+       titles.filter(x => x != magicWord)
+             .map(x => (x, link))
+    }.groupByKey()
+    
+    val teleport = 0.15 * (1.0 / numDocs)
+   
+    val adjMat = adjMatrix.cache()
     var ranks = adjMat.map(x => (x._1, 1.0 / numDocs))
 
     var diff = 0.0
