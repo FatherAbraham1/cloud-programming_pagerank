@@ -10,9 +10,9 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 import com.alibaba.fastjson.JSON;
 
-import cp2016.pagerank.common.TitleRankPair;
+import cp2016.pagerank.common.TitleRanksPair;
 
-public class RowReducer extends Reducer<Text, Text, TitleRankPair, Text> {
+public class RowReducer extends Reducer<Text, Text, TitleRanksPair, Text> {
 	@Override
 	public void reduce(Text key,
 			Iterable<Text> values, Context context)
@@ -32,6 +32,6 @@ public class RowReducer extends Reducer<Text, Text, TitleRankPair, Text> {
 			}
 		}
 		
-		context.write(new TitleRankPair(key.toString(), 1.0 / numberOfTitles),  new Text(JSON.toJSONString(links)));
+		context.write(new TitleRanksPair(key.toString(), -1.0, 1.0 / numberOfTitles), new Text(JSON.toJSONString(links)));
 	}
 }

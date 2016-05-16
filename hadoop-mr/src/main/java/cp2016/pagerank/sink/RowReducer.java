@@ -28,7 +28,7 @@ public class RowReducer extends Reducer<IntWritable, DoubleWritable, Text, Text>
 		}
 		
 		FileSystem fs = FileSystem.get(context.getConfiguration());
-		Path path = new Path("tmp/sinkNodeScore");
+		Path path = new Path(context.getConfiguration().get("sinkNodeOutputFile"));
 		OutputStreamWriter writer = new OutputStreamWriter(fs.create(path, true));
 		BufferedWriter bw = new BufferedWriter(writer);
         bw.write(Double.toString(score / numTitles) + "\n");

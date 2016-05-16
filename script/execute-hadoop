@@ -2,18 +2,7 @@
 
 BASEDIR=$(dirname "$0")
 
-hdfs dfs -rm -f -r tmp
 hdfs dfs -rm -f -r $2
+hdfs dfs -mkdir -p $(dirname "$2")
 
-hdfs dfs -mkdir -p tmp
-hdfs dfs -mkdir -p tmp/titles
-
-NUMDOCS=$(hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.parse.App $1 tmp/init)
-
-hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.filter.App tmp/init tmp/one $NUMDOCS
-
-$BASEDIR/hadoop-sink-score one $NUMDOCS
-
-python $BASEDIR/hadoop-py $NUMDOCS
-
-hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.result.App tmp/stable $2
+hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.App $1 $2

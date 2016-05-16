@@ -1,7 +1,0 @@
-#!/bin/sh
-
-BASEDIR=$(dirname "$0")
-
-hdfs dfs -rm -f -r tmp/$2
-
-hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.iterate.App tmp/$1 tmp/$2 $3

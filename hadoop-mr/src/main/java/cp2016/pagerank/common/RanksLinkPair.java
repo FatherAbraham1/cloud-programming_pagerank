@@ -8,24 +8,31 @@ import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 
-public class ScoreLinkPair implements Writable {
+public class RanksLinkPair implements Writable {
 
-	private DoubleWritable score;
+	private DoubleWritable prevRank;
+	private DoubleWritable curRank;
 	private Text linksJSON;
 	
 	
-	public ScoreLinkPair() {
-		this.score = new DoubleWritable(0.0);
+	public RanksLinkPair() {
+		this.prevRank = new DoubleWritable(0.0);
+		this.curRank = new DoubleWritable(0.0);
 		this.linksJSON = new Text("");
 	}
 	
-	public ScoreLinkPair(double score, String linksJSON) {
-		this.score = new DoubleWritable(score);
+	public RanksLinkPair(double prevRank, double curRank, String linksJSON) {
+		this.prevRank = new DoubleWritable(prevRank);
+		this.curRank = new DoubleWritable(curRank);
 		this.linksJSON = new Text(linksJSON); 
 	}
 	
-	public double getScore() {
-		return score.get();
+	public double getPreviousRank() {
+		return prevRank.get();
+	}
+	
+	public double getCurrentRank() {
+		return curRank.get();
 	}
 	
 	public String getLinksJSON() {
@@ -34,13 +41,15 @@ public class ScoreLinkPair implements Writable {
 	
 	@Override
 	public void write(DataOutput out) throws IOException {
-		score.write(out);
+		prevRank.write(out);
+		curRank.write(out);
 		linksJSON.write(out);
 	}
 
 	@Override
 	public void readFields(DataInput in) throws IOException {
-		score.readFields(in);
+		prevRank.readFields(in);
+		curRank.readFields(in);
 		linksJSON.readFields(in);
 	}
 }

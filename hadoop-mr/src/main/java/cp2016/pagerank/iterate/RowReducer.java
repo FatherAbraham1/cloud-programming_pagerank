@@ -5,22 +5,24 @@ import java.io.IOException;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
-import cp2016.pagerank.common.ScoreLinkPair;
+import cp2016.pagerank.common.RanksLinkPair;
 
-public class RowReducer extends Reducer<Text, ScoreLinkPair, Text, Text> {
+public class RowReducer extends Reducer<Text, RanksLinkPair, Text, Text> {
 	@Override
 	public void reduce(Text key,
-			Iterable<ScoreLinkPair> values, Context context)
+			Iterable<RanksLinkPair> values, Context context)
 			throws IOException, InterruptedException {
 		double constantFactor = context.getConfiguration().getDouble("constantFactor", 0.0);
 		if (constantFactor <= 0.0) {
 			throw new RuntimeException("add 0.0?");
 		}
 		
-		double score = 0.0;
+		double newScore = 0.0;
+		double oldScore = 0.0;
 		String link = null;
-		for (ScoreLinkPair p : values) {
-			score += p.getScore();
+		for (RanksLinkPair p : values) {
+			oldScore += p.getPreviousRank();
+			newScore += p.getCurrentRank();
 			if (link == null) {
 				String linkString = p.getLinksJSON();
 				if (!linkString.isEmpty()) {
@@ -29,9 +31,9 @@ public class RowReducer extends Reducer<Text, ScoreLinkPair, Text, Text> {
 			}
 		}
 		double stickness = context.getConfiguration().getDouble("stickness", 0.0);
-		score *= stickness;
-		score += constantFactor;
+		newScore *= stickness;
+		newScore += constantFactor;
 		
-		context.write(key, new Text(Double.toString(score) + "\t" + link));
+		context.write(key, new Text(String.join("\t", Double.toString(oldScore), Double.toString(newScore))));
 	}
 }

@@ -14,13 +14,15 @@ public class RowMapper extends Mapper<LongWritable, Text, IntWritable, DoubleWri
 			throws IOException, InterruptedException {
 		
 		String[] vals = value.toString().split("\n");
+		double sink = 0.0;
 		for(String val : vals) {
 			String[] stuffs = val.split("\t");
-			if (stuffs.length == 3) {
-				if (stuffs[2].equals("[]")) {
-					context.write(new IntWritable(0), new DoubleWritable(Double.parseDouble(stuffs[1])));
+			if (stuffs.length == 4) {
+				if (stuffs[3].equals("[]")) {
+					sink += Double.parseDouble(stuffs[2]);
 				}
 			}
 		}
+		context.write(new IntWritable(0), new DoubleWritable(sink));
 	}
 }
