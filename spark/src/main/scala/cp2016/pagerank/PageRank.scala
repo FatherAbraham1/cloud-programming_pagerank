@@ -31,7 +31,7 @@ object PageRank {
       }
     }
 
-    val pages = ctx.textFile(inputPath, ctx.defaultParallelism * 3)
+    val pages = ctx.textFile(inputPath, ctx.defaultParallelism * 9)
 
     val linkPattern = """\[\[[^\]]+\]\]""".r
     val linkSplitPattern = "[#|]"
@@ -41,14 +41,14 @@ object PageRank {
     val adjMat = pages.flatMap { line =>
       val xmlElement = XML.loadString(line)
       val title = (xmlElement \\ "title").text.capitalize
-      var links = linkPattern.findAllIn(line)
+      var links = linkPattern.findAllIn(xmlElement.text)
                              .toArray
                              .map { link => link.substring(2, link.length() - 2).split(linkSplitPattern) }
                              .filter { arr => arr.size > 0 }
-                             .map { arr => (unescape(arr(0)).capitalize, title) }
+                             .map { arr => (arr(0).capitalize, title) }
 
       links.union(Array((title, "🐦" + title + "🐦")))
-    }.groupByKey(ctx.defaultParallelism * 3).filter { tup => 
+    }.groupByKey(ctx.defaultParallelism * 9).filter { tup => 
       val magicWord = "🐦" + tup._1 + "🐦"
       val titles = tup._2.toSet
       titles.contains(magicWord)
@@ -63,7 +63,7 @@ object PageRank {
            (link, "")
          }
        }
-    }.groupByKey(ctx.defaultParallelism * 3).map { tup =>
+    }.groupByKey(ctx.defaultParallelism * 9).map { tup =>
       if(tup._2.size == 1){
         (tup._1, Iterable())
       } else {
@@ -117,7 +117,7 @@ object PageRank {
       println(s"round: " + (end - begin)/1000000000.0)
     } while(diff >= 0.001)
 
-    ranks.sortBy(tup => (-tup._2, tup._1), true, ctx.defaultParallelism * 12)
+    ranks.sortBy(tup => (-tup._2, tup._1), true, ctx.defaultParallelism * 9)
           .map(tup => tup._1 + "\t" + tup._2.toString())
           .saveAsTextFile(outputDir)
 
