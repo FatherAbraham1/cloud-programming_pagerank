@@ -24,7 +24,7 @@ public class RowMapper extends Mapper<LongWritable, Text, Text, Text> {
 			if (links.contains(title)) {
 				for (String link : links) {
 					if(!link.equals(title)) {
-						context.write(new Text(title), new Text(link));
+						context.write(new Text(link), new Text(title));
 					}
 				}
 			}

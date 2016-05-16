@@ -8,12 +8,12 @@ hdfs dfs -rm -f -r $2
 hdfs dfs -mkdir -p tmp
 hdfs dfs -mkdir -p tmp/titles
 
-num_docs = $(hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.parse.App $1 tmp/init)
-echo $num_docs
-hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.filter.App tmp/init tmp/one $num_docs
+NUMDOCS=$(hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.parse.App $1 tmp/init)
+echo $NUMDOCS
+hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.filter.App tmp/init tmp/one $NUMDOCS
 
-$BASEDIR/hadoop-sink-score one $num_docs
+$BASEDIR/hadoop-sink-score one $NUMDOCS
 
-python $BASEDIR/hadoop-py $num_docs
+python $BASEDIR/hadoop-py $NUMDOCS
 
 hadoop jar $BASEDIR/../target/hadoop.jar cp2016.pagerank.result.App tmp/stable $2
