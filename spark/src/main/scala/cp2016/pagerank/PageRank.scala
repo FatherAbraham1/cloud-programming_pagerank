@@ -57,9 +57,20 @@ object PageRank {
       val link = tup._1
        val magicWord = "🐦" + link + "🐦"
        val titles = tup._2.toSet
-       titles.filter(x => x != magicWord)
-             .map(x => (x, link))
-    }.groupByKey()
+       titles.map { x =>
+         if (x != magicWord) {
+           (x, link)
+         } else {
+           (x, "")
+         }
+       }
+    }.groupByKey.map { tup =>
+      if(tup._2.size == 1){
+        (tup._1, Iterable())
+      } else {
+        tup
+      }
+    }
 
     adjMatrix.saveAsTextFile("not-a-file")
     return
@@ -73,7 +84,7 @@ object PageRank {
     do {
       val begin = System.nanoTime()
       var sinkNodeRankSum = adjMat.join(ranks)
-                                  .filter(tup => tup._2._1.size == 1)
+                                  .filter(tup => tup._2._1.size == 0)
                                   .map(tup => tup._2._2)
                                   .sum()
 
@@ -82,11 +93,11 @@ object PageRank {
 
       val updates = adjMat.join(ranks)
                           .values
-                          .filter(tup => tup._1.size > 1)
+                          .filter(tup => tup._1.size >= 1)
                           .flatMap { case (links, rank) =>
                             val size = links.size
                             links.filter(x => x != "")
-                                 .map(x => (x, rank / (size - 1)))
+                                 .map(x => (x, rank / size))
                            }
       var newRanks = updates.reduceByKey(_ + _)
       newRanks = ranks.fullOuterJoin(newRanks).map(x => (x._1, x._2._2.getOrElse(0.0) * 0.85 + teleport + sinkNodeRankSum))
