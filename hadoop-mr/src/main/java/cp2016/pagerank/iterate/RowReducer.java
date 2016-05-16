@@ -34,6 +34,6 @@ public class RowReducer extends Reducer<Text, RanksLinkPair, Text, Text> {
 		newScore *= stickness;
 		newScore += constantFactor;
 		
-		context.write(key, new Text(String.join("\t", Double.toString(oldScore), Double.toString(newScore))));
+		context.write(key, new Text(String.join("\t", Double.toString(oldScore), Double.toString(newScore), link)));
 	}
 }
