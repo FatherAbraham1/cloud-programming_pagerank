@@ -33,6 +33,7 @@ public class RowMapper extends Mapper<LongWritable, Text, Text, Text> {
 					title = titleMatcher.group();
 					title = title.substring(7, title.length() - 8);
 					title = StringEscapeUtils.unescapeXml(title);
+          title = title.replaceAll("\\s+", " ");
 					title = capString(title);
 				}
 
@@ -41,14 +42,14 @@ public class RowMapper extends Mapper<LongWritable, Text, Text, Text> {
 				if (title == null) {
 					continue;
 				}
-				
+
 				context.getCounter(MapCounter.InputRecords).increment(1);
-				
+
 				List<String> links = new ArrayList<>();
 				if (text != null) {
 					links = parseLinks(text);
 				}
-				
+
 				for (String link : links) {
 					context.write(new Text(link), new Text(title));
 				}
@@ -88,6 +89,7 @@ public class RowMapper extends Mapper<LongWritable, Text, Text, Text> {
 			}
 
 			String finalLink = capString(StringEscapeUtils.unescapeXml(linkContent).trim());
+      finalLink = finalLink.replaceAll("\\s+", " ");
 			if (!finalLink.isEmpty()){
 				links.add(finalLink);
 			}
