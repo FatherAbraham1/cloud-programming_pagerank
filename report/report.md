@@ -5,11 +5,12 @@
 
 ## Instructions
 
-### Build
+### Build MapReduce Version
 
 [Apache Maven](https://maven.apache.org/) is used as the build tool for MapReduce version of my program, you can install it locally in the project directory.
 
 ```sh
+$ cd HW2_103062512_MR
 $ script/bootstrap
 
 Installing Apache Maven...
@@ -30,35 +31,39 @@ Building Hadoop MapReduce version...
 [INFO] Finished at: 2016-05-15T10:41:30+08:00
 [INFO] Final Memory: 122M/392M
 [INFO] ------------------------------------------------------------------------
+```
 
-Building Apache Spark version...
+### Build Spark Version
+
+To fill up the jar, use the following commands:
+
+```sh
+$ cd HW2_103062512_Spark
+$ script/build
+
+Building Spark version...
 ....
 [success] Total time: 1 s, completed May 15, 2016 10:41:31 AM
 ```
 
-Those bottles will be placed under `target`:
+### Run MapReduce Version
 
-```sh
-$ tree target 
-target
-├── hadoop.jar
-└── spark.jar
-
-0 directories, 2 files
-```
-
-### Run
-
-To execute the program, use the following scripts:
+To execute the program, use the following command:
 
 ```sh
 # run Hadoop MapReduce version
-# usage: script/execute-hadoop inputFile outputDir
-$ script/execute-hadoop /shared/HW2/sample-in/input-100M hw2/hadoop-100M
+# usage: script/run inputFile outputDir
+$ script/run /shared/HW2/sample-in/input-100M hw2/hadoop-100M
+```
 
+### Run Spark Version
+
+To execute the program, use the following command:
+
+```sh
 # run Spark version
-# usage: script/execute-spark inputFile outputDir
-$ script/execute-spark /shared/HW2/sample-in/input-100M hw2/spark-100M
+# usage: script/run inputFile outputDir
+$ script/run /shared/HW2/sample-in/input-100M hw2/spark-100M
 ```
 
 ## Implementation

@@ -490,11 +490,12 @@ div.prism-show-language > div.prism-show-language-label {
 
 <h2 id="toc_2">Instructions</h2>
 
-<h3 id="toc_3">Build</h3>
+<h3 id="toc_3">Build MapReduce Version</h3>
 
 <p><a href="https://maven.apache.org/">Apache Maven</a> is used as the build tool for MapReduce version of my program, you can install it locally in the project directory.</p>
 
-<div><pre><code class="language-bash">$ script/bootstrap
+<div><pre><code class="language-bash">$ cd HW2_103062512_MR
+$ script/bootstrap
 
 Installing Apache Maven...
 Apache Maven installed in tool/apache-maven</code></pre></div>
@@ -511,38 +512,40 @@ Building Hadoop MapReduce version...
 [INFO] Total time: 4.131 s
 [INFO] Finished at: 2016-05-15T10:41:30+08:00
 [INFO] Final Memory: 122M/392M
-[INFO] ------------------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------</code></pre></div>
 
-Building Apache Spark version...
+<h3 id="toc_4">Build Spark Version</h3>
+
+<p>To fill up the jar, use the following commands:</p>
+
+<div><pre><code class="language-bash">$ cd HW2_103062512_Spark
+$ script/build
+
+Building Spark version...
 ....
 [success] Total time: 1 s, completed May 15, 2016 10:41:31 AM</code></pre></div>
 
-<p>Those bottles will be placed under <code>target</code>:</p>
+<h3 id="toc_5">Run MapReduce Version</h3>
 
-<div><pre><code class="language-bash">$ tree target 
-target
-├── hadoop.jar
-└── spark.jar
-
-0 directories, 2 files</code></pre></div>
-
-<h3 id="toc_4">Run</h3>
-
-<p>To execute the program, use the following scripts:</p>
+<p>To execute the program, use the following command:</p>
 
 <div><pre><code class="language-bash"># run Hadoop MapReduce version
-# usage: script/execute-hadoop inputFile outputDir
-$ script/execute-hadoop /shared/HW2/sample-in/input-100M hw2/hadoop-100M
+# usage: script/run inputFile outputDir
+$ script/run /shared/HW2/sample-in/input-100M hw2/hadoop-100M</code></pre></div>
 
-# run Spark version
-# usage: script/execute-spark inputFile outputDir
-$ script/execute-spark /shared/HW2/sample-in/input-100M hw2/spark-100M</code></pre></div>
+<h3 id="toc_6">Run Spark Version</h3>
 
-<h2 id="toc_5">Implementation</h2>
+<p>To execute the program, use the following command:</p>
+
+<div><pre><code class="language-bash"># run Spark version
+# usage: script/run inputFile outputDir
+$ script/run /shared/HW2/sample-in/input-100M hw2/spark-100M</code></pre></div>
+
+<h2 id="toc_7">Implementation</h2>
 
 <p>Both MapReduce version and Spark version share the same logic of data processing:</p>
 
-<h3 id="toc_6">Parsing the input text file into a graph</h3>
+<h3 id="toc_8">Parsing the input text file into a graph</h3>
 
 <p>First, break the file into lines, each line is a XML string representing a page.</p>
 
@@ -557,7 +560,7 @@ $ script/execute-spark /shared/HW2/sample-in/input-100M hw2/spark-100M</code></p
 <li>capitalizing </li>
 </ol>
 
-<h4 id="toc_7">Removing invalid links</h4>
+<h4 id="toc_9">Removing invalid links</h4>
 
 <p>I used some tricks to remove the invalid links:</p>
 
@@ -580,15 +583,15 @@ F -&gt; [B]</code></pre></div>
 
 <p>As you can see, for non-existing documents, no self-links will be built, thus we can use the rule to prune the invalid links.</p>
 
-<h4 id="toc_8">Count number of documents</h4>
+<h4 id="toc_10">Count number of documents</h4>
 
 <p>In MapReduce, <code>Counter</code> is used to record the number of documents.</p>
 
 <p>In Spark, simple apply an action <code>.count</code> on RDD to get the number of documents.</p>
 
-<h3 id="toc_9">Perform iterations on the graph</h3>
+<h3 id="toc_11">Perform iterations on the graph</h3>
 
-<h4 id="toc_10">Dangling Node Score</h4>
+<h4 id="toc_12">Dangling Node Score</h4>
 
 <p>In each iteration, we need to calculate the sum of PageRanks of dangling nodes and pass it to each node.</p>
 
@@ -596,7 +599,7 @@ F -&gt; [B]</code></pre></div>
 
 <p>In Spark, simply do some <code>filter</code>-<code>map</code>-<code>sum</code> would do the trick.</p>
 
-<h4 id="toc_11">Calculate New PageRank Score</h4>
+<h4 id="toc_13">Calculate New PageRank Score</h4>
 
 <p>In MapReduce, the input and output file will be in this format:</p>
 
@@ -626,7 +629,7 @@ F -&gt; [B]</code></pre></div>
 
 <p>In Spark, this is relatively simple, just emit the score and reduce it by the document title, and we’re done.</p>
 
-<h4 id="toc_12">Check if Convergence Criterion is Met</h4>
+<h4 id="toc_14">Check if Convergence Criterion is Met</h4>
 
 <p>Using the structure mentioned in the previous section, we can easily calculate the differences of PageRank scores between current score and the one in the previous iteration.</p>
 
@@ -636,13 +639,13 @@ F -&gt; [B]</code></pre></div>
 
 <p>If the convergence criterion is met, stop iterating and sort the results.</p>
 
-<h3 id="toc_13">Sort results</h3>
+<h3 id="toc_15">Sort results</h3>
 
 <p>Sort by the PageRank scores, then the document titles.</p>
 
-<h2 id="toc_14">Execution Logs</h2>
+<h2 id="toc_16">Execution Logs</h2>
 
-<h3 id="toc_15">MapReduce</h3>
+<h3 id="toc_17">MapReduce</h3>
 
 <table>
 <thead>
@@ -677,7 +680,7 @@ F -&gt; [B]</code></pre></div>
 </tbody>
 </table>
 
-<h3 id="toc_16">Spark</h3>
+<h3 id="toc_18">Spark</h3>
 
 <table>
 <thead>
@@ -707,9 +710,9 @@ F -&gt; [B]</code></pre></div>
 </tbody>
 </table>
 
-<h2 id="toc_17">Experiment and Analysis</h2>
+<h2 id="toc_19">Experiment and Analysis</h2>
 
-<h3 id="toc_18">Data Characteristics</h3>
+<h3 id="toc_20">Data Characteristics</h3>
 
 <table>
 <thead>
@@ -754,7 +757,7 @@ F -&gt; [B]</code></pre></div>
 </tbody>
 </table>
 
-<h3 id="toc_19">PageRank Score</h3>
+<h3 id="toc_21">PageRank Score</h3>
 
 <p><img src="./assets/top-pages.svg" alt="top page scores"></p>
 
@@ -821,15 +824,15 @@ F -&gt; [B]</code></pre></div>
 </tbody>
 </table>
 
-<h3 id="toc_20">Convergence Rate</h3>
+<h3 id="toc_22">Convergence Rate</h3>
 
 <p><img src="./assets/convergence-trace.svg" alt="convergence"></p>
 
-<h3 id="toc_21">Performance Comparison</h3>
+<h3 id="toc_23">Performance Comparison</h3>
 
 <p>In this section, we will discuss the performance (in terms of time, since the PageRank scores should be the same) differences between MapReduce and Spark.</p>
 
-<h4 id="toc_22">Parsing time</h4>
+<h4 id="toc_24">Parsing time</h4>
 
 <p><img src="./assets/parsing-time.svg" alt="parsing time"></p>
 
@@ -837,7 +840,7 @@ F -&gt; [B]</code></pre></div>
 <p>since evaluation of Spark is lazy, we call <code>.collect</code> explicitly to activate the evaluation chain.</p>
 </blockquote>
 
-<h4 id="toc_23">Iteration</h4>
+<h4 id="toc_25">Iteration</h4>
 
 <p>The following figure shows the average execution time per iteration:</p>
 
@@ -853,7 +856,7 @@ F -&gt; [B]</code></pre></div>
 
 <p>In MapReduce, step 1 is a separate job, while step 2 and 3 are in the same job and it’s associated with map and reduce phase respectively.</p>
 
-<h2 id="toc_24"></h2>
+<h2 id="toc_26"></h2>
 
 <p>In MapReduce, the execution time is consistent across iterations since they are all disk I/O operations.</p>
 
@@ -861,7 +864,7 @@ F -&gt; [B]</code></pre></div>
 
 <p>The following iterations will use a cached copy generated in the first iteration thus are faster.</p>
 
-<h2 id="toc_25">Experience and Conclusion</h2>
+<h2 id="toc_27">Experience and Conclusion</h2>
 
 <p>Processing data using Spark is like what we do in our local machine, but the program can be placed to a distributed system and it will work fine in the parallel environment.</p>
 
@@ -879,7 +882,7 @@ F -&gt; [B]</code></pre></div>
 
 <p>[1]: <a href="http://www-bcf.usc.edu/%7Eminlanyu/teach/csci599-fall12/papers/nsdi_spark.pdf">http://www-bcf.usc.edu/~minlanyu/teach/csci599-fall12/papers/nsdi_spark.pdf</a></p>
 
-<h2 id="toc_26">Feedback</h2>
+<h2 id="toc_28">Feedback</h2>
 
 <p>TL;DR</p>
 
