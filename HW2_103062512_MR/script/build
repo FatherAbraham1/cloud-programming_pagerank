@@ -2,8 +2,8 @@
 
 BASEDIR=$(dirname "$0")
 
-rm -rf $BASEDIR/../target
-mkdir -p $BASEDIR/../target
+rm -rf $BASEDIR/target
+mkdir -p $BASEDIR/target
 
 echo 'Building Hadoop MapReduce version...'
 (

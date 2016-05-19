@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# WARNING: this script only works with maven, please install it in your env
+
+BASEDIR=$(dirname "$0")
+
+rm -rf $BASEDIR/target
+mkdir -p $BASEDIR/target
+
+echo 'Building Spark version...'
+(
+  cd $BASEDIR/../
+  sbt package
+  cp target/scala-2.10/pagerank_2.10-1.0.jar ./target/spark.jar
+)
