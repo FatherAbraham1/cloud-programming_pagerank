@@ -66,7 +66,7 @@ object StatisticsBuilder {
     
     println(s"valid links = " + validLinks)
     println(s"invalid links = " + (allLinks - validLinks))
-    println(s"% invalid links = " + ((allLinks - validLinks) / allLinks))
+    println(s"% invalid links = " + ((allLinks - validLinks) / allLinks.toDouble))
     println(s"numDocs = " + pages.count)
   }
 }
