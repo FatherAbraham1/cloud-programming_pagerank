@@ -1,0 +1,5 @@
+#!/bin/sh
+
+BASEDIR=$(dirname "$0")
+
+spark-submit --class cp2016.pagerank.stats.StatisticsBuilder --num-executors 30 $BASEDIR/../target/spark.jar $1
