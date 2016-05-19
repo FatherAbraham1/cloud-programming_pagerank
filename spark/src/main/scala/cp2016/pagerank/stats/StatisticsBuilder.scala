@@ -27,8 +27,8 @@ object StatisticsBuilder {
 
       links.union(Array((title, "🐦" + title + "🐦")))
     }
-    
-    println(s"total links = " + adjMat.count)
+    val allLinks = adjMat.count()
+    println(s"total links = " + allLinks)
     
     
     val validLinks = pages.flatMap { line =>
@@ -65,7 +65,8 @@ object StatisticsBuilder {
     }.map(x => x._2.size).sum
     
     println(s"valid links = " + validLinks)
-
+    println(s"invalid links = " + (allLinks - validLinks))
+    println(s"% invalid links = " + ((allLinks - validLinks) / allLinks))
     println(s"numDocs = " + pages.count)
   }
 }
