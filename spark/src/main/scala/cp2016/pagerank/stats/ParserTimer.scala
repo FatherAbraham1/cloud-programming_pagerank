@@ -7,9 +7,21 @@ import org.apache.hadoop.fs._
 object ParserTimer {
   def main(args: Array[String]) {
     val inputPath = args(0)
+    val outputDir = args(1)
 
     val config = new SparkConf().setAppName("ParserTimer")
     val ctx = new SparkContext(config)
+
+    // clean output directory
+    val hadoopConf = ctx.hadoopConfiguration
+    var hdfs = FileSystem.get(hadoopConf)
+    try {
+      hdfs.delete(new Path(outputDir), true)
+    } catch {
+      case ex : Throwable => {
+        println(ex.getMessage)
+      }
+    }
 
     val pages = ctx.textFile(inputPath, ctx.defaultParallelism * 9)
 
@@ -17,7 +29,7 @@ object ParserTimer {
     val linkSplitPattern = "[#|]"
 
     val startTime = System.nanoTime()
-    val _ = pages.flatMap { line =>
+    val okie = pages.flatMap { line =>
       val xmlElement = XML.loadString(line)
       val title = (xmlElement \\ "title").text.capitalize
       var links = linkPattern.findAllIn(xmlElement.text)
@@ -48,8 +60,10 @@ object ParserTimer {
       } else {
         (tup._1, tup._2.filter(x => !x.isEmpty()))
       }
-    }.collect()
+    }
 
+    okie.map(x => (x._1, "🐦")).saveAsTextFile(outputDir)
     println(s"parsing time = " + ((System.nanoTime - startTime) / 1000000000.0))
+
   }
 }
