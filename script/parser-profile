@@ -2,4 +2,4 @@
 
 BASEDIR=$(dirname "$0")
 
-spark-submit --class cp2016.pagerank.stats.ParserTimer --num-executors 30 $BASEDIR/../target/spark.jar $1
+spark-submit --class cp2016.pagerank.stats.ParserTimer --num-executors 30 $BASEDIR/../target/spark.jar $1 $2
