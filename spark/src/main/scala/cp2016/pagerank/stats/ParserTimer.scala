@@ -50,6 +50,6 @@ object ParserTimer {
       }
     }.collect()
 
-    println(s"parsing time = " + ((System.nanoTime - startTime) / 1000000000))
+    println(s"parsing time = " + ((System.nanoTime - startTime) / 1000000000.0))
   }
 }
