@@ -62,7 +62,7 @@ object StatisticsBuilder {
       } else {
         (tup._1, tup._2.filter(x => !x.isEmpty()))
       }
-    }.map(x => x._2.size).sum
+    }.map(x => x._2.size).sum.toInt
     
     println(s"valid links = " + validLinks)
     println(s"invalid links = " + (allLinks - validLinks))
