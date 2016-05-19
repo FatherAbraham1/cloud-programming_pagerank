@@ -1,0 +1,13 @@
+# WARNING: this script only works with maven, please install it in your env
+
+BASEDIR=$(dirname "$0")
+
+rm -rf $BASEDIR/../target
+mkdir -p $BASEDIR/../target
+
+echo 'Building Hadoop MapReduce version...'
+(
+  cd $BASEDIR/../
+  ./tool/apache-maven/bin/mvn assembly:assembly
+  cp target/pagerank-0.0.1-SNAPSHOT-jar-with-dependencies.jar ./target/hadoop.jar
+)
