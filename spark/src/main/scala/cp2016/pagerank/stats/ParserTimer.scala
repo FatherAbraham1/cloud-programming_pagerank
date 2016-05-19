@@ -17,7 +17,7 @@ object ParserTimer {
     val linkSplitPattern = "[#|]"
 
     val startTime = System.nanoTime()
-    val validLinks = pages.flatMap { line =>
+    val _ = pages.flatMap { line =>
       val xmlElement = XML.loadString(line)
       val title = (xmlElement \\ "title").text.capitalize
       var links = linkPattern.findAllIn(xmlElement.text)
